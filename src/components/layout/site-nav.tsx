@@ -1,10 +1,8 @@
 "use client";
 
-import { Menu, X } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
@@ -35,13 +33,11 @@ const textLink =
 
 // fora.so-style borderless navigation: brand left, links centred, actions
 // right, sitting directly on the page at the top and gaining a soft blurred
-// fade once scrolled. Light/dark follows the section beneath it.
+// fade once scrolled. Light/dark follows the section beneath it. On phones the
+// links live in the floating MobileDock instead of a menu.
 export function SiteNav() {
   const [dark, setDark] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
-
-  const close = useCallback(() => setOpen(false), []);
 
   // Theme + backdrop follow the section under the bar (rAF-throttled).
   useEffect(() => {
@@ -77,31 +73,6 @@ export function SiteNav() {
       window.removeEventListener("resize", schedule);
     };
   }, []);
-
-  // Mobile sheet: lock body scroll, close on Escape and when the viewport
-  // grows past the mobile breakpoint.
-  useEffect(() => {
-    if (!open) return;
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") close();
-    };
-    const desktop = window.matchMedia("(min-width: 1000px)");
-    const onChange = (event: MediaQueryListEvent) => {
-      if (event.matches) close();
-    };
-
-    window.addEventListener("keydown", onKey);
-    desktop.addEventListener("change", onChange);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", onKey);
-      desktop.removeEventListener("change", onChange);
-    };
-  }, [open, close]);
 
   const theme = dark ? "dark" : "light";
 
@@ -172,64 +143,18 @@ export function SiteNav() {
         </ul>
 
         <div className="flex items-center gap-3 min-[1000px]:gap-5">
-          <Link href={navActions.signIn.href} className={`hidden min-[1000px]:inline-flex ${textLink}`}>
+          <Link href={navActions.signIn.href} className={textLink}>
             {navActions.signIn.label}
           </Link>
-          <Button href={navActions.demo.href} variant="ghost" size="sm">
-            {navActions.demo.label}
-          </Button>
-          <button
-            type="button"
-            aria-label={open ? "Close navigation" : "Open navigation"}
-            aria-expanded={open}
-            aria-controls="site-nav-sheet"
-            onClick={() => setOpen((value) => !value)}
-            className="-mr-2 grid size-9 place-items-center opacity-80 transition-opacity duration-200 ease-apple hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current min-[1000px]:hidden"
-          >
-            {open ? <X aria-hidden className="size-5" /> : <Menu aria-hidden className="size-5" />}
-          </button>
+          {/* On phones the demo action lives in the MobileDock. */}
+          <span className="hidden min-[1000px]:inline-flex">
+            <Button href={navActions.demo.href} variant="ghost" size="sm">
+              {navActions.demo.label}
+            </Button>
+          </span>
         </div>
       </Container>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            id="site-nav-sheet"
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className={
-              `absolute inset-x-0 top-0 max-h-dvh overflow-y-auto pt-16 backdrop-blur-xl min-[1000px]:hidden ` +
-              (dark ? "bg-night/96" : "bg-paper/96")
-            }
-          >
-            <Container className="pt-3 pb-7">
-              <ul className="flex flex-col">
-                {navLinks.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      onClick={close}
-                      className="block py-3 text-[22px] font-semibold tracking-[-0.03em] transition-opacity duration-200 ease-apple hover:opacity-70"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-5 flex flex-col gap-2.5">
-                <Button href={navActions.signIn.href} variant="ghost" size="md" className="w-full" onClick={close}>
-                  {navActions.signIn.label}
-                </Button>
-                <Button href={navActions.demo.href} variant="primary" size="md" className="w-full" onClick={close}>
-                  {navActions.demo.label}
-                </Button>
-              </div>
-            </Container>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </header>
   );
 }

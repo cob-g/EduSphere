@@ -1,4 +1,4 @@
-import type { ComponentPropsWithoutRef } from "react";
+import type { ComponentProps } from "react";
 
 type SectionProps = {
   /** Ground colour. Drives text colour, button colours and the nav's light/dark mode. */
@@ -6,7 +6,7 @@ type SectionProps = {
   /** Background token for the theme. Defaults to paper (light) / night (dark). */
   tone?: "paper" | "white" | "night" | "night-2";
   className?: string;
-} & Omit<ComponentPropsWithoutRef<"section">, "className">;
+} & Omit<ComponentProps<"section">, "className">;
 
 const tones = {
   paper: "bg-paper text-ink",

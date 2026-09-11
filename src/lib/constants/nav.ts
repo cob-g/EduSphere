@@ -12,3 +12,11 @@ export const navActions = {
 } as const;
 
 export const contactEmail = "hello@edusphere.ai";
+
+// Social profiles shown in the footer. Replace the handles once the official
+// accounts exist.
+export const socialLinks = [
+  { label: "LinkedIn", href: "https://www.linkedin.com/company/edusphere-ai" },
+  { label: "Facebook", href: "https://www.facebook.com/edusphereai" },
+  { label: "Telegram", href: "https://t.me/edusphereai" },
+] as const;
