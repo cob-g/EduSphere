@@ -4,7 +4,7 @@ The public marketing website for **EduSphere AI**.
 
 This repository contains only the public site. The EduSphere school platform itself is a separate Laravel application.
 
-> Status: technical foundation only. The homepage is a development placeholder; the real design has not been implemented yet.
+> Status: homepage implemented. Design direction: Apple Vision Pro–style presentation (glass devices, halos, cinematic full-bleed dark bands, oversized centred headlines) combined with fora.so's strict black-and-white palette, Inter typography and centred floating pill navigation. No accent colour.
 
 ## Tech stack
 
@@ -13,7 +13,18 @@ This repository contains only the public site. The EduSphere school platform its
 - [GSAP](https://gsap.com) + ScrollTrigger + [`@gsap/react`](https://gsap.com/resources/React/) (`useGSAP`)
 - [Motion for React](https://motion.dev) (`motion/react`)
 - [Lucide React](https://lucide.dev) icons
+- Inter via `next/font/google` (self-hosted, optical-size axis enabled)
 - ESLint (`eslint-config-next`)
+
+## Structure
+
+- `src/app/globals.css` — design tokens (monochrome palette, radii, display type utilities, glass surfaces) as Tailwind 4 `@theme` / `@utility`
+- `src/components/ui/` — `Section` (every band carries `data-theme`, which the nav reads to switch light/dark glass), `Container`, `Button`, `Eyebrow`, `Brand`
+- `src/components/motion/reveal.tsx` — scroll-triggered fade-up (GSAP ScrollTrigger, reduced-motion safe)
+- `src/components/layout/` — `SiteNav` (centred floating glass pill, mobile sheet) and `SiteFooter`
+- `src/components/sections/` — one file per homepage band, assembled in `src/app/page.tsx`
+  - the hero is a layered daylight scene inspired by fora.so's hero but built as a white studio: `hero-atmosphere.tsx` (pale sky with drifting clouds, ink constellation canvas, three rock-edged mountain ranges with fog between them, valley floor, film grain; plus `HeroForeground`, a nearest range and valley fog rendered in front of the device so it stands inside the scene), `hero-window.tsx` (light glass slab with floor shadow and reflection showing the executive overview, rotating between schools), `hero-scene.tsx` (GSAP parallax per depth, cloud drift, device tilt)
+- `src/lib/constants/nav.ts` — navigation links and actions
 
 ## Prerequisites
 

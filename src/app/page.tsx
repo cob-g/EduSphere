@@ -1,14 +1,27 @@
-import { StackCheck } from "@/components/dev/stack-check";
-import { siteConfig } from "@/lib/constants/site";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteNav } from "@/components/layout/site-nav";
+import { AiTeacher } from "@/components/sections/ai-teacher";
+import { Cta } from "@/components/sections/cta";
+import { Hero } from "@/components/sections/hero";
+import { LessonFlow } from "@/components/sections/lesson-flow";
+import { Mission } from "@/components/sections/mission";
+import { Modules } from "@/components/sections/modules";
+import { Trust } from "@/components/sections/trust";
 
-// Development placeholder — replaced when the real homepage is implemented.
 export default function Home() {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-2xl flex-col justify-center px-6 py-16">
-      <p className="text-sm font-medium text-neutral-500">{siteConfig.name}</p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight">Public Website Foundation</h1>
-      <p className="mt-3 text-lg text-neutral-600">{siteConfig.tagline}</p>
-      <StackCheck />
-    </main>
+    <>
+      <SiteNav />
+      <main>
+        <Hero />
+        <Mission />
+        <AiTeacher />
+        <LessonFlow />
+        <Modules />
+        <Trust />
+        <Cta />
+      </main>
+      <SiteFooter />
+    </>
   );
 }

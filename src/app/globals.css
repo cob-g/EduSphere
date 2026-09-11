@@ -1,15 +1,46 @@
 @import "tailwindcss";
 
 /*
- * Design tokens.
- * Minimal placeholder foundation — the palette (black, white, off-white,
- * grayscale, restrained EduSphere blue) and type scale will be defined
- * here when the real design system is implemented.
+ * EduSphere design system.
+ *
+ * Direction: Apple Vision Pro feel (glass, halos, cinematic full-bleed dark
+ * sections, oversized centred headlines) combined with fora.so's strict
+ * black-and-white palette and centred pill navigation.
+ *
+ * There is NO accent colour. Emphasis comes from contrast, weight and space.
  */
 @theme {
-  --font-sans:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial,
-    sans-serif;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+
+  /* Monochrome palette */
+  --color-ink: #09090b;          /* primary text on light */
+  --color-paper: #f5f5f7;        /* Apple off-white ground */
+  --color-paper-2: #fbfbfd;
+  --color-muted: #6e6e73;
+  --color-muted-2: #86868b;
+  --color-line: #d9d9df;
+  --color-night: #000000;        /* full-bleed dark ground */
+  --color-night-2: #0a0a0c;
+  --color-night-3: #101114;
+  --color-line-dark: #1c1f24;
+  --color-muted-dark: #a1a1a6;
+  --color-muted-dark-2: #727278;
+
+  /* Radii */
+  --radius-device: 46px;
+  --radius-card: 34px;
+  --radius-panel: 22px;
+  --radius-pill: 999px;
+
+  /* Layout */
+  --container-site: 1180px;
+
+  /* Shadows */
+  --shadow-float: 0 30px 90px rgba(0, 0, 0, 0.12);
+  --shadow-float-dark: 0 45px 130px rgba(0, 0, 0, 0.65);
+
+  /* Motion */
+  --ease-apple: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @layer base {
@@ -17,9 +48,86 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 
   body {
-    @apply bg-white text-black;
+    @apply bg-paper text-ink font-sans overflow-x-hidden;
+    font-feature-settings: "cv11", "ss01", "ss03";
   }
+
+  ::selection {
+    background: #09090b;
+    color: #fff;
+  }
+  [data-theme="dark"] ::selection {
+    background: #fff;
+    color: #09090b;
+  }
+}
+
+@utility container-site {
+  width: min(calc(100% - 44px), var(--container-site));
+  margin-inline: auto;
+  @media (max-width: 680px) {
+    width: min(calc(100% - 28px), var(--container-site));
+  }
+}
+
+/* Display type: Apple-tight tracking, Inter's optical size axis kicks in at large sizes. */
+@utility text-display-1 {
+  font-size: clamp(66px, 9vw, 128px);
+  line-height: 0.91;
+  letter-spacing: -0.06em;
+  font-weight: 600;
+}
+@utility text-display-2 {
+  font-size: clamp(48px, 7vw, 92px);
+  line-height: 0.96;
+  letter-spacing: -0.05em;
+  font-weight: 600;
+}
+@utility text-display-3 {
+  font-size: clamp(34px, 4.2vw, 52px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-weight: 600;
+}
+@utility text-lead {
+  font-size: clamp(19px, 2.1vw, 26px);
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+}
+
+/* Glass surfaces (Vision Pro) */
+@utility glass-light {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  backdrop-filter: saturate(180%) blur(18px);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+}
+@utility glass-dark {
+  background: rgba(16, 16, 18, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: saturate(180%) blur(18px);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+}
+
+/* Ring used on dark glass devices */
+@utility ring-device-dark {
+  box-shadow:
+    0 45px 130px rgba(0, 0, 0, 0.65),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+@utility ring-device-light {
+  box-shadow:
+    0 40px 120px rgba(0, 0, 0, 0.14),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.95);
 }
