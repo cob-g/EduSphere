@@ -93,13 +93,13 @@ export function Services() {
         <div className="grid gap-14 lg:grid-cols-[.85fr_1.15fr] lg:gap-20">
           <div className="lg:sticky lg:top-[112px] lg:self-start">
             <Reveal>
-              <Eyebrow>Core services</Eyebrow>
+              <Eyebrow variant="pill">Core services</Eyebrow>
             </Reveal>
             <Reveal delay={0.05}>
               <h2 className="text-display-2">
                 All services.
                 <br />
-                <span className="text-muted-dark">Five categories.</span>
+                <span className="text-accent-serif text-muted-dark">Five categories.</span>
               </h2>
             </Reveal>
             <Reveal delay={0.1}>

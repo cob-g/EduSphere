@@ -14,7 +14,7 @@ export function AiTeacher() {
       <SparklesTitle>
         <Container className="max-w-[1000px] pb-16 text-center max-sm:pb-10">
           <Reveal>
-            <Eyebrow>EduSphere AI Virtual Teacher</Eyebrow>
+            <Eyebrow variant="pill">EduSphere AI Virtual Teacher</Eyebrow>
           </Reveal>
           <Reveal delay={0.1}>
             <h2 className="text-display-2 mb-7">

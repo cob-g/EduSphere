@@ -11,6 +11,7 @@
  */
 @theme {
   --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: var(--font-instrument-serif), "Times New Roman", Georgia, serif;
 
   /* Monochrome palette */
   --color-ink: #09090b;          /* primary text on light */
@@ -128,6 +129,17 @@
   line-height: 1.35;
   letter-spacing: -0.02em;
   font-weight: 400;
+}
+
+/* The italic serif line inside a two-tone display headline. Instrument Serif
+   sits smaller on the em than Inter, so it is scaled up a touch and its
+   tracking loosened from the display setting. */
+@utility text-accent-serif {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.08em;
+  letter-spacing: -0.02em;
 }
 
 /* Ring used on dark glass devices */

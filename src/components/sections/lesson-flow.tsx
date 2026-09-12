@@ -49,7 +49,7 @@ export function LessonFlow() {
       <Container className="max-w-[1180px]">
         <div className="mb-16 text-center max-sm:mb-10">
           <Reveal>
-            <Eyebrow>Start with the teacher</Eyebrow>
+            <Eyebrow variant="pill">Start with the teacher</Eyebrow>
           </Reveal>
           <Reveal delay={0.1}>
             <h2 className="text-display-2">From lesson to learning.</h2>

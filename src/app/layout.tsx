@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Instrument_Serif, Inter } from "next/font/google";
 
 import { MotionProvider } from "@/components/motion/motion-provider";
 import { organizationSchema, siteConfig } from "@/lib/constants/site";
@@ -13,6 +13,17 @@ const inter = Inter({
   display: "swap",
   variable: "--font-inter",
   axes: ["opsz"],
+});
+
+// One italic serif, used for the second line of two-tone headlines. It is the
+// one thing on the page Apple's system never does, and it carries the warmth
+// a script face would, at display size and still legible.
+const serif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: "italic",
+  display: "swap",
+  variable: "--font-instrument-serif",
 });
 
 export const metadata: Metadata = {
@@ -40,7 +51,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`${inter.variable} ${serif.variable}`}>
       <body>
         <MotionProvider>{children}</MotionProvider>
         <script

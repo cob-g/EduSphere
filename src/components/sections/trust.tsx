@@ -68,13 +68,13 @@ export function Trust() {
         <div className="mb-16 grid grid-cols-1 gap-8 lg:mb-20 lg:grid-cols-[1.15fr_.85fr] lg:items-end">
           <div>
             <Reveal>
-              <Eyebrow>Trust by design</Eyebrow>
+              <Eyebrow variant="pill">Trust by design</Eyebrow>
             </Reveal>
             <Reveal delay={0.05}>
               <h2 className="text-display-2">
                 Intelligence
                 <br />
-                <span className="text-muted">the whole school can trust.</span>
+                <span className="text-accent-serif text-muted">the whole school can trust.</span>
               </h2>
             </Reveal>
           </div>

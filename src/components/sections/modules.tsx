@@ -69,7 +69,7 @@ export function Modules() {
       <Container>
         <div className="text-center">
           <Reveal>
-            <Eyebrow>The school operating system</Eyebrow>
+            <Eyebrow variant="pill">The school operating system</Eyebrow>
           </Reveal>
           <Reveal delay={0.05}>
             <h2 className="text-display-2 mb-7">

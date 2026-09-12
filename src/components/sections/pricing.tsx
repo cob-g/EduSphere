@@ -42,13 +42,13 @@ export function Pricing() {
       <Container>
         <div className="mx-auto max-w-[880px] text-center">
           <Reveal>
-            <Eyebrow>Pricing</Eyebrow>
+            <Eyebrow variant="pill">Pricing</Eyebrow>
           </Reveal>
           <Reveal delay={0.05}>
             <h2 className="text-display-2">
               No public pricing.
               <br />
-              <span className="text-muted">Just a custom proposal.</span>
+              <span className="text-accent-serif text-muted">Just a custom proposal.</span>
             </h2>
           </Reveal>
           <Reveal delay={0.1}>

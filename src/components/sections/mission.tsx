@@ -11,7 +11,7 @@ export function Mission() {
     <Section theme="dark" tone="night" className="py-[180px] max-sm:py-[130px]">
       <Container>
         <Reveal>
-          <Eyebrow>The idea</Eyebrow>
+          <Eyebrow variant="pill">The idea</Eyebrow>
           <MissionStatement />
         </Reveal>
       </Container>
