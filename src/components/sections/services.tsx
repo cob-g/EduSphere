@@ -11,7 +11,7 @@ import {
   AnalyticsVisual,
   ConsultingVisual,
   InstitutionalVisual,
-  SupportVisual,
+  QualityVisual,
 } from "./services-visuals";
 
 type Group = { letter: string; name: string; visual: ReactNode; items: string[] };
@@ -41,12 +41,12 @@ const groups: Group[] = [
   },
   {
     letter: "C",
-    visual: <SupportVisual />,
-    name: "AI Student Support",
+    visual: <QualityVisual />,
+    name: "Quality Information System",
     items: [
-      "AI Chatbots for Admissions & Student Services",
-      "Predictive Analytics for Student Retention",
-      "Personalised Academic Advising",
+      "Quality Assurance Dashboards",
+      "Outcomes-Based Education Tracking",
+      "Internal Audit & Survey Management",
     ],
   },
   {

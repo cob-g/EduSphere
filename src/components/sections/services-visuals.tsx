@@ -135,36 +135,50 @@ export function InstitutionalVisual() {
   );
 }
 
-// C. Admissions chatbot + retention watchlist.
-const RISK = [
-  ["Santos, M.", 82],
-  ["Lim, J.", 61],
-  ["Garcia, R.", 44],
+// C. Quality assurance: program scores, outcome attainment, audit status.
+const PROGRAMS = [
+  ["BSCS", 92],
+  ["BSIT", 88],
+  ["BSED", 84],
+] as const;
+const OUTCOMES = [
+  ["Critical thinking", 91],
+  ["Communication", 86],
+  ["Research", 78],
 ] as const;
 
-export function SupportVisual() {
+export function QualityVisual() {
   return (
     <Panel>
-      <Head>Admissions Assistant</Head>
-      <div className="space-y-2">
-        <div className="ml-auto w-fit max-w-[85%] rounded-[14px_14px_4px_14px] border border-white/20 bg-white/[0.06] px-3 py-2 text-[12px]">
-          Kailan ang enrollment for transferees?
-        </div>
-        <div className="w-fit max-w-[88%] rounded-[14px_14px_14px_4px] border border-white/10 px-3 py-2 text-[12px] text-white/85">
-          June 3 to 14. I can reserve a slot for you now.
-        </div>
+      <Head>Quality Assurance</Head>
+      <div className="text-[10px] text-white/45">Program quality score</div>
+      <div className="mt-3 space-y-2.5">
+        {PROGRAMS.map(([program, score]) => (
+          <div key={program} className="flex items-center gap-3 text-[11px]">
+            <span className="w-12 text-white/75">{program}</span>
+            <Bar value={score} className="flex-1" />
+            <span className="w-8 text-right tabular-nums">{score}</span>
+          </div>
+        ))}
       </div>
 
       <div className="mt-6 border-t border-white/10 pt-4">
-        <div className="text-[11px] text-white/55">At-risk this week</div>
-        <div className="mt-3 space-y-2.5">
-          {RISK.map(([name, risk]) => (
-            <div key={name} className="grid grid-cols-[76px_1fr] items-center gap-3 text-[11px]">
-              <span className="text-white/80">{name}</span>
-              <Bar value={risk} />
+        <div className="text-[10px] text-white/45">Outcome attainment</div>
+        <div className="mt-3 grid grid-cols-3 gap-2">
+          {OUTCOMES.map(([outcome, pct]) => (
+            <div key={outcome} className="rounded-[12px] border border-white/10 p-3">
+              <div className="text-[18px] leading-none font-semibold tracking-[-0.03em] tabular-nums">
+                {pct}%
+              </div>
+              <div className="mt-1.5 text-[10px] leading-tight text-white/55">{outcome}</div>
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="mt-3 flex items-center justify-between rounded-[12px] border border-white/10 px-3.5 py-3 text-[11px]">
+        <span className="text-white/80">Internal audit</span>
+        <span className="text-white/55">2 open findings</span>
       </div>
     </Panel>
   );
