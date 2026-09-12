@@ -56,6 +56,11 @@
   }
 
   /* Footer ambience */
+  --animate-shine: shine 1.1s var(--ease-apple) both;
+  @keyframes shine {
+    from { transform: translateX(-120%) skewX(-14deg); }
+    to { transform: translateX(420%) skewX(-14deg); }
+  }
   --animate-breathe: breathe 8s ease-in-out infinite alternate;
   --animate-marquee: marquee 46s linear infinite;
   @keyframes breathe {

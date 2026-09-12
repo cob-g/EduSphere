@@ -3,11 +3,13 @@
 import { ArrowUp, Mail } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 
 import { FacebookIcon, LinkedinIcon, TelegramIcon } from "@/components/ui/brand-icons";
 import { Button } from "@/components/ui/button";
 import { Magnetic } from "@/components/ui/magnetic";
+
+import { FooterEmail } from "./footer-email";
 import { Section } from "@/components/ui/section";
 import { gsap, MOTION_QUERIES, ScrollTrigger, useGSAP } from "@/lib/animations/gsap";
 import { contactEmail, navLinks, socialLinks } from "@/lib/constants/nav";
@@ -126,6 +128,20 @@ export function SiteFooter() {
 
   const mailto = `mailto:${contactEmail}`;
 
+  // Cursor spotlight on the wordmark. Coordinates are written as CSS
+  // variables on the wordmark element, so React never re-renders on move.
+  const spotlight = (e: PointerEvent<HTMLElement>) => {
+    const el = giant.current;
+    if (!el || e.pointerType !== "mouse") return;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty("--sx", `${e.clientX - r.left}px`);
+    el.style.setProperty("--sy", `${e.clientY - r.top}px`);
+  };
+  const spotlightOff = () => {
+    giant.current?.style.setProperty("--sx", "-999px");
+    giant.current?.style.setProperty("--sy", "-999px");
+  };
+
   return (
     <Section
       ref={wrap}
@@ -138,6 +154,8 @@ export function SiteFooter() {
         ref={footer}
         id="footer"
         role="contentinfo"
+        onPointerMove={spotlight}
+        onPointerLeave={spotlightOff}
         className={`group flex w-full flex-col bg-night text-white ${
           curtain ? "fixed bottom-0 left-0 h-[100dvh]" : "relative min-h-[100dvh]"
         }`}
@@ -163,9 +181,17 @@ export function SiteFooter() {
         >
           <div
             ref={giant}
-            className="text-[clamp(96px,21vw,320px)] leading-none font-semibold tracking-[-0.07em] whitespace-nowrap text-white/[0.04] mask-[linear-gradient(180deg,#000_20%,rgba(0,0,0,.1)_90%)] [-webkit-text-stroke:1.5px_rgba(255,255,255,.16)]"
+            className="relative text-[clamp(96px,21vw,320px)] leading-none font-semibold tracking-[-0.07em] whitespace-nowrap text-white/[0.04] mask-[linear-gradient(180deg,#000_20%,rgba(0,0,0,.1)_90%)] [-webkit-text-stroke:1.5px_rgba(255,255,255,.16)]"
+            style={{ "--sx": "-999px", "--sy": "-999px" } as CSSProperties}
           >
             EDUSPHERE
+            {/* Spotlight: the same letters, lit, revealed only around the cursor */}
+            <span
+              aria-hidden
+              className="absolute inset-0 hidden text-white/[0.06] mask-[radial-gradient(240px_circle_at_var(--sx)_var(--sy),#000,transparent_70%)] [-webkit-text-stroke:1.5px_rgba(255,255,255,.85)] [@media(hover:hover)_and_(pointer:fine)]:block"
+            >
+              EDUSPHERE
+            </span>
           </div>
         </div>
 
@@ -210,6 +236,8 @@ export function SiteFooter() {
                 </Button>
               </Magnetic>
             </div>
+            <FooterEmail email={contactEmail} />
+
             <nav aria-label="Footer" className="flex flex-wrap justify-center gap-2.5">
               {navLinks.map((link) => (
                 <Magnetic key={link.href} strength={0.2}>
