@@ -1,6 +1,6 @@
 "use client";
 
-import { Blocks, Layers, LayoutGrid, ShieldCheck, Sparkles, Tag, type LucideIcon } from "lucide-react";
+import { Blocks, LayoutGrid, ShieldCheck, Sparkles, Tag, type LucideIcon } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -9,7 +9,6 @@ import { navLinks } from "@/lib/constants/nav";
 
 const ICONS: Record<string, LucideIcon> = {
   "#teacher": Sparkles,
-  "#platform": Layers,
   "#modules": LayoutGrid,
   "#security": ShieldCheck,
   "#services": Blocks,
@@ -31,7 +30,7 @@ const focusRing =
 // Phone navigation: a floating dock at the thumb, in place of a burger menu.
 // One tab per section with a sliding highlight that tracks scroll. The demo
 // action lives in the top bar on these widths, which leaves the dock its full
-// width for six tabs. The glass inverts against the section behind it and the
+// width for five tabs. The glass inverts against the section behind it and the
 // dock retires once the footer (which carries its own actions) takes over.
 export function MobileDock() {
   const [active, setActive] = useState<string | null>(null);
@@ -100,7 +99,7 @@ export function MobileDock() {
       className={`fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+14px)] z-50 flex justify-center px-4 lg:hidden ${hidden ? "pointer-events-none" : ""}`}
     >
       <div
-        className={`flex w-full max-w-[440px] items-stretch gap-0.5 rounded-[26px] border p-1.5 backdrop-blur-lg backdrop-saturate-150 transition-colors duration-300 ease-apple sm:gap-1 ${shell}`}
+        className={`flex w-full max-w-[420px] items-stretch gap-0.5 rounded-[26px] border p-1.5 backdrop-blur-lg backdrop-saturate-150 transition-colors duration-300 ease-apple sm:gap-1 ${shell}`}
       >
         {navLinks.map((link) => {
           const Icon = ICONS[link.href] ?? Sparkles;

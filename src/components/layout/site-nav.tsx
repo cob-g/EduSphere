@@ -33,7 +33,7 @@ const textLink =
 // right, sitting directly on the page at the top and gaining a soft blurred
 // fade once scrolled. Light/dark follows the section beneath it. Below the
 // desktop breakpoint the links live in the floating MobileDock instead of a
-// menu, and the demo button stays up here so the dock has room for six tabs.
+// menu, and the demo button stays up here so the dock has room for five tabs.
 export function SiteNav() {
   const [dark, setDark] = useState(false);
   const [scrolled, setScrolled] = useState(false);
