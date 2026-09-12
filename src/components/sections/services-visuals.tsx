@@ -76,7 +76,7 @@ export function AcademicVisual() {
   );
 }
 
-// B. Timetable with a flagged conflict, live slots.
+// E. Timetable with a flagged conflict, live slots.
 const DAYS = ["M", "T", "W", "Th", "F"];
 const BLOCKS: Array<[number, number, number, "solid" | "dim" | "conflict"]> = [
   [0, 0, 1, "solid"],
@@ -233,50 +233,51 @@ export function AnalyticsVisual() {
   );
 }
 
-// E. Transformation roadmap: phases, stack, training.
-const PHASES = [
-  ["Assess", "done"],
-  ["Design", "done"],
-  ["Build", "now"],
-  ["Train", "next"],
+// B. Finance and operations: collections, payroll, procurement, assets.
+const OPERATIONS = [
+  ["Payroll", "142 staff · Ready"],
+  ["Procurement", "3 pending approvals"],
+  ["Assets", "1,280 tagged"],
 ] as const;
-const STACK = ["Cloud infrastructure", "Security", "CHED-aligned SIS"];
 
-export function ConsultingVisual() {
+export function ManagementVisual() {
   return (
     <Panel>
-      <Head>Roadmap</Head>
-      <div className="grid grid-cols-4 gap-1.5">
-        {PHASES.map(([label, state]) => (
-          <div key={label}>
-            <div
-              className={`h-1.5 rounded-pill ${
-                state === "done" ? "bg-white" : state === "now" ? "bg-white/55" : "bg-white/15"
-              }`}
-            />
-            <div className={`mt-2 text-[10px] ${state === "next" ? "text-white/35" : "text-white/75"}`}>
-              {label}
-            </div>
-          </div>
-        ))}
+      <Head>Finance &amp; Operations</Head>
+      <div className="flex items-baseline justify-between text-[11px]">
+        <span className="text-white/55">Tuition collected</span>
+        <span className="tabular-nums">
+          78<span className="text-white/40">%</span>
+        </span>
+      </div>
+      <Bar value={78} className="mt-2" />
+      <div className="mt-2 flex justify-between text-[10px] text-white/40 tabular-nums">
+        <span>Term 1</span>
+        <span>Due Oct 15</span>
       </div>
 
       <div className="mt-6 divide-y divide-white/10 border-y border-white/10">
-        {STACK.map((item) => (
-          <div key={item} className="py-2.5 text-[11px] text-white/80">
-            {item}
+        {OPERATIONS.map(([item, status]) => (
+          <div key={item} className="flex items-center justify-between py-2.5 text-[11px]">
+            <span className="text-white/80">{item}</span>
+            <span className="text-white/50">{status}</span>
           </div>
         ))}
       </div>
 
-      <div className="mt-5">
-        <div className="flex items-baseline justify-between text-[11px]">
-          <span className="text-white/55">Faculty trained</span>
-          <span className="tabular-nums">
-            120<span className="text-white/40">/150</span>
-          </span>
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="rounded-[12px] border border-white/10 p-3">
+          <div className="text-[10px] text-white/45">Invoices sent</div>
+          <div className="mt-1 text-[20px] leading-none font-semibold tracking-[-0.03em] tabular-nums">
+            4,610
+          </div>
         </div>
-        <Bar value={80} className="mt-2" />
+        <div className="rounded-[12px] border border-white/10 p-3">
+          <div className="text-[10px] text-white/45">Overdue</div>
+          <div className="mt-1 text-[20px] leading-none font-semibold tracking-[-0.03em] tabular-nums">
+            212
+          </div>
+        </div>
       </div>
     </Panel>
   );

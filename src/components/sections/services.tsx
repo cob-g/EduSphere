@@ -9,8 +9,8 @@ import { ServicesIndex } from "./services-index";
 import {
   AcademicVisual,
   AnalyticsVisual,
-  ConsultingVisual,
   InstitutionalVisual,
+  ManagementVisual,
   QualityVisual,
 } from "./services-visuals";
 
@@ -31,12 +31,12 @@ const groups: Group[] = [
   },
   {
     letter: "B",
-    visual: <InstitutionalVisual />,
-    name: "Institutional Systems",
+    visual: <ManagementVisual />,
+    name: "Management Information System",
     items: [
-      "Smart Enrollment & Scheduling",
-      "Student Information System with Analytics",
-      "Faculty Performance Monitoring",
+      "Finance & Billing Management",
+      "Human Resources & Payroll",
+      "Assets & Procurement",
     ],
   },
   {
@@ -61,12 +61,12 @@ const groups: Group[] = [
   },
   {
     letter: "E",
-    visual: <ConsultingVisual />,
-    name: "Digital Transformation Consulting",
+    visual: <InstitutionalVisual />,
+    name: "Institutional Systems",
     items: [
-      "IT Infrastructure Planning",
-      "CHED-aligned System Development",
-      "Faculty Training & Upskilling",
+      "Smart Enrollment & Scheduling",
+      "Student Information System with Analytics",
+      "Faculty Performance Monitoring",
     ],
   },
 ];
