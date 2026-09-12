@@ -1,104 +1,72 @@
+import type { ReactNode } from "react";
+
 import { Reveal } from "@/components/motion/reveal";
 import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Section } from "@/components/ui/section";
 
 import { ServicesIndex } from "./services-index";
+import {
+  AcademicVisual,
+  AnalyticsVisual,
+  ConsultingVisual,
+  InstitutionalVisual,
+  SupportVisual,
+} from "./services-visuals";
 
-type Service = { title: string; text: string };
-type Group = { letter: string; name: string; items: Service[] };
+type Group = { letter: string; name: string; visual: ReactNode; items: string[] };
 
-// Fifteen services in five categories. Descriptions are cut to one line each
-// but keep every claim from the source copy.
+// Fifteen services in five categories. Each category is shown as a rendered
+// image of the product; the service names ride along as numbered captions.
 const groups: Group[] = [
   {
     letter: "A",
+    visual: <AcademicVisual />,
     name: "AI Academic Systems",
     items: [
-      {
-        title: "Intelligent Learning Management System (AI-LMS)",
-        text: "Adapts to each student's pace, tracks engagement and delivers personalised content automatically.",
-      },
-      {
-        title: "Adaptive Learning Platforms",
-        text: "Learning paths that keep adjusting to each student's strengths, weaknesses and pace.",
-      },
-      {
-        title: "AI-based Assessment Tools",
-        text: "Automated grading, intelligent question generation and real-time assessment analytics.",
-      },
+      "Intelligent Learning Management System (AI-LMS)",
+      "Adaptive Learning Platforms",
+      "AI-based Assessment Tools",
     ],
   },
   {
     letter: "B",
+    visual: <InstitutionalVisual />,
     name: "Institutional Systems",
     items: [
-      {
-        title: "Smart Enrollment & Scheduling",
-        text: "Automated section assignment, schedule conflict detection and live slot tracking per course.",
-      },
-      {
-        title: "Student Information System with Analytics",
-        text: "Complete profiles, grade analytics, academic history and AI retention forecasting.",
-      },
-      {
-        title: "Faculty Performance Monitoring",
-        text: "Teaching evaluation, workload management and performance analytics for academic faculty.",
-      },
+      "Smart Enrollment & Scheduling",
+      "Student Information System with Analytics",
+      "Faculty Performance Monitoring",
     ],
   },
   {
     letter: "C",
+    visual: <SupportVisual />,
     name: "AI Student Support",
     items: [
-      {
-        title: "AI Chatbots for Admissions & Student Services",
-        text: "Admissions inquiries, service requests and FAQs answered around the clock.",
-      },
-      {
-        title: "Predictive Analytics for Student Retention",
-        text: "Flags at-risk students early and recommends timely, personalised interventions.",
-      },
-      {
-        title: "Personalised Academic Advising",
-        text: "Data-driven guidance on course selection, career paths and academic progress.",
-      },
+      "AI Chatbots for Admissions & Student Services",
+      "Predictive Analytics for Student Retention",
+      "Personalised Academic Advising",
     ],
   },
   {
     letter: "D",
+    visual: <AnalyticsVisual />,
     name: "Data & Analytics",
     items: [
-      {
-        title: "Administrator Dashboard",
-        text: "A real-time view of enrollment, performance and compliance data in one place.",
-      },
-      {
-        title: "Academic Performance Forecasting",
-        text: "Forecasts student outcomes, course demand and institutional trends for planning.",
-      },
-      {
-        title: "Accreditation & Compliance Reporting",
-        text: "Automated CHED-aligned reports, accreditation checklists and audit documentation.",
-      },
+      "Administrator Dashboard",
+      "Academic Performance Forecasting",
+      "Accreditation & Compliance Reporting",
     ],
   },
   {
     letter: "E",
+    visual: <ConsultingVisual />,
     name: "Digital Transformation Consulting",
     items: [
-      {
-        title: "IT Infrastructure Planning",
-        text: "Assessment and design of secure, cloud-based infrastructure sized to your institution.",
-      },
-      {
-        title: "CHED-aligned System Development",
-        text: "Custom software built to CHED policies, academic standards and Philippine regulations.",
-      },
-      {
-        title: "Faculty Training & Upskilling",
-        text: "Hands-on programmes that equip educators to use AI tools and digital platforms well.",
-      },
+      "IT Infrastructure Planning",
+      "CHED-aligned System Development",
+      "Faculty Training & Upskilling",
     ],
   },
 ];
@@ -113,10 +81,11 @@ const numbered = groups.reduce<Array<Group & { first: number; last: number }>>((
   return [...acc, { ...g, first, last: first + g.items.length - 1 }];
 }, []);
 
-// Band 8: the full catalogue, as an index rather than a wall of cards. The
-// left column sticks: headline, lead, and the A to E list that tracks the
-// scroll. The right column is fifteen numbered hairline rows. Dark, so the
-// page keeps alternating between Trust and Pricing.
+// Band 8: the full catalogue. The left column sticks: headline, lead, and the
+// A to E list that tracks the scroll. The right column is five image panels,
+// one per category, each a rendered view of that part of the product with the
+// category's services as numbered captions. Dark, so the page keeps
+// alternating between Trust and Pricing.
 export function Services() {
   return (
     <Section theme="dark" tone="night" id="services" className="py-[105px] md:py-[150px]">
@@ -145,16 +114,24 @@ export function Services() {
             </Reveal>
           </div>
 
-          <div>
+          <div className="grid gap-5">
             {numbered.map((g, gi) => (
-              <Reveal
-                key={g.letter}
-                as="section"
-                delay={gi * 0.05}
-                className={gi === 0 ? "" : "mt-14"}
-              >
-                <div id={groupId(g)} className="scroll-mt-[112px]">
-                  <div className="mb-3 flex items-baseline gap-4">
+              <Reveal key={g.letter} as="section" delay={gi * 0.05}>
+                <div
+                  id={groupId(g)}
+                  className="relative flex min-h-[560px] scroll-mt-[112px] flex-col overflow-hidden rounded-[22px] border border-white/10 bg-[#0b0b0d] p-7 max-sm:min-h-0 md:p-8"
+                >
+                  {/* Light from above, like the AI Teacher stage */}
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0"
+                    style={{
+                      background:
+                        "radial-gradient(70% 55% at 50% -10%, rgba(255,255,255,.12), transparent 60%)",
+                    }}
+                  />
+
+                  <div className="relative flex items-baseline gap-4">
                     <span className="text-[44px] leading-none font-semibold tracking-[-0.05em]">
                       {g.letter}
                     </span>
@@ -163,26 +140,21 @@ export function Services() {
                       {pad(g.first)}–{pad(g.last)}
                     </span>
                   </div>
-                  <ol className="divide-y divide-white/10 border-y border-white/10">
-                    {g.items.map((item, i) => {
-                      const n = g.first + i;
-                      return (
-                        <li
-                          key={item.title}
-                          className="group grid gap-x-6 gap-y-1 py-4 transition-colors duration-300 ease-apple md:grid-cols-[36px_1fr_1.1fr] md:items-baseline"
-                        >
-                          <span className="text-[11px] text-white/40 tabular-nums transition-colors duration-300 ease-apple group-hover:text-white">
-                            {pad(n)}
-                          </span>
-                          <span className="text-[15px] font-medium tracking-[-0.01em] text-white">
-                            {item.title}
-                          </span>
-                          <span className="text-[13.5px] leading-[1.55] text-muted-dark">
-                            {item.text}
-                          </span>
-                        </li>
-                      );
-                    })}
+
+                  <div className="relative grid flex-1 place-items-center py-8 md:py-10">
+                    {g.visual}
+                  </div>
+
+                  <ol className="relative flex flex-wrap gap-2">
+                    {g.items.map((title, i) => (
+                      <li
+                        key={title}
+                        className="inline-flex items-baseline gap-2 rounded-pill border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[12px] text-white/85"
+                      >
+                        <span className="text-[10px] text-white/40 tabular-nums">{pad(g.first + i)}</span>
+                        {title}
+                      </li>
+                    ))}
                   </ol>
                 </div>
               </Reveal>
