@@ -1,17 +1,19 @@
 "use client";
 
-import { CalendarCheck, Layers, LayoutGrid, ShieldCheck, Sparkles, type LucideIcon } from "lucide-react";
+import { Blocks, Layers, LayoutGrid, ShieldCheck, Sparkles, Tag, type LucideIcon } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { navActions, navLinks } from "@/lib/constants/nav";
+import { navLinks } from "@/lib/constants/nav";
 
 const ICONS: Record<string, LucideIcon> = {
   "#teacher": Sparkles,
   "#platform": Layers,
   "#modules": LayoutGrid,
   "#security": ShieldCheck,
+  "#services": Blocks,
+  "#pricing": Tag,
 };
 
 // Where the "current section" is sampled: a little above the middle of the
@@ -27,9 +29,10 @@ const focusRing =
   "outline-none focus-visible:ring-2 focus-visible:ring-current/40 focus-visible:ring-inset";
 
 // Phone navigation: a floating dock at the thumb, in place of a burger menu.
-// One tab per section with a sliding highlight that tracks scroll, plus the
-// demo action. The glass inverts against the section behind it and the dock
-// retires once the footer (which carries its own actions) takes over.
+// One tab per section with a sliding highlight that tracks scroll. The demo
+// action lives in the top bar on these widths, which leaves the dock its full
+// width for six tabs. The glass inverts against the section behind it and the
+// dock retires once the footer (which carries its own actions) takes over.
 export function MobileDock() {
   const [active, setActive] = useState<string | null>(null);
   const [dark, setDark] = useState(false);
@@ -85,11 +88,6 @@ export function MobileDock() {
   const highlight = dark ? "bg-ink/[0.09]" : "bg-white/[0.14]";
   const activeText = dark ? "text-ink" : "text-white";
   const idleText = dark ? "text-ink/50" : "text-white/55";
-  // Demo is an action, not a place: outlined rather than filled so it never
-  // reads as the selected tab.
-  const cta = dark
-    ? "border border-ink/20 text-ink hover:bg-ink/[0.06]"
-    : "border border-white/25 text-white hover:bg-white/[0.08]";
 
   return (
     <motion.nav
@@ -102,7 +100,7 @@ export function MobileDock() {
       className={`fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+14px)] z-50 flex justify-center px-4 lg:hidden ${hidden ? "pointer-events-none" : ""}`}
     >
       <div
-        className={`flex w-full max-w-[420px] items-stretch gap-1 rounded-[26px] border p-1.5 backdrop-blur-lg backdrop-saturate-150 transition-colors duration-300 ease-apple ${shell}`}
+        className={`flex w-full max-w-[440px] items-stretch gap-0.5 rounded-[26px] border p-1.5 backdrop-blur-lg backdrop-saturate-150 transition-colors duration-300 ease-apple sm:gap-1 ${shell}`}
       >
         {navLinks.map((link) => {
           const Icon = ICONS[link.href] ?? Sparkles;
@@ -119,24 +117,15 @@ export function MobileDock() {
               <Link
                 href={link.href}
                 aria-current={isActive ? "location" : undefined}
+                aria-label={link.label}
                 className={`${focusRing} relative z-10 flex h-[54px] flex-col items-center justify-center gap-1 rounded-[20px] text-[10px] font-medium tracking-[0.01em] whitespace-nowrap transition-colors duration-300 ease-apple ${isActive ? activeText : idleText}`}
               >
                 <Icon aria-hidden className="size-[19px]" strokeWidth={isActive ? 2.25 : 1.75} />
-                {link.label}
+                {link.short}
               </Link>
             </motion.div>
           );
         })}
-
-        <motion.div whileTap={{ scale: 0.92 }} className="flex-1">
-          <Link
-            href={navActions.demo.href}
-            className={`${focusRing} flex h-[54px] flex-col items-center justify-center gap-1 rounded-[20px] text-[10px] font-medium tracking-[0.01em] whitespace-nowrap transition-colors duration-300 ease-apple ${cta}`}
-          >
-            <CalendarCheck aria-hidden className="size-[19px]" strokeWidth={1.75} />
-            Demo
-          </Link>
-        </motion.div>
       </div>
     </motion.nav>
   );

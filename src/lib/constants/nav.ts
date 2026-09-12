@@ -1,9 +1,12 @@
-// Primary navigation. All targets are anchors on the homepage for now.
+// Primary navigation, in page order. All targets are anchors on the homepage.
+// `short` is the label the phone dock uses, where six tabs share the width.
 export const navLinks = [
-  { label: "AI Teacher", href: "#teacher" },
-  { label: "Platform", href: "#platform" },
-  { label: "Modules", href: "#modules" },
-  { label: "Security", href: "#security" },
+  { label: "AI Teacher", short: "Teacher", href: "#teacher" },
+  { label: "Platform", short: "Platform", href: "#platform" },
+  { label: "Modules", short: "Modules", href: "#modules" },
+  { label: "Security", short: "Security", href: "#security" },
+  { label: "Services", short: "Services", href: "#services" },
+  { label: "Pricing", short: "Pricing", href: "#pricing" },
 ] as const;
 
 export const navActions = {

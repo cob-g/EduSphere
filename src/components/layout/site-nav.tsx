@@ -31,8 +31,9 @@ const textLink =
 
 // fora.so-style borderless navigation: brand left, links centred, actions
 // right, sitting directly on the page at the top and gaining a soft blurred
-// fade once scrolled. Light/dark follows the section beneath it. On phones the
-// links live in the floating MobileDock instead of a menu.
+// fade once scrolled. Light/dark follows the section beneath it. Below the
+// desktop breakpoint the links live in the floating MobileDock instead of a
+// menu, and the demo button stays up here so the dock has room for six tabs.
 export function SiteNav() {
   const [dark, setDark] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -119,7 +120,7 @@ export function SiteNav() {
         </Link>
 
         {/* Absolutely centred so it stays centred regardless of the side widths. */}
-        <ul className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-7 lg:flex">
+        <ul className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-5 lg:flex xl:gap-7">
           {navLinks.map((link) => (
             <li key={link.href}>
               <Link href={link.href} className={textLink}>
@@ -129,16 +130,14 @@ export function SiteNav() {
           ))}
         </ul>
 
-        <div className="flex items-center gap-3 lg:gap-5">
+        <div className="flex items-center gap-4 lg:gap-5">
           <Link href={navActions.signIn.href} className={textLink}>
             {navActions.signIn.label}
           </Link>
-          {/* On phones the demo action lives in the MobileDock. */}
-          <span className="hidden lg:inline-flex">
-            <Button href={navActions.demo.href} variant="ghost" size="sm">
-              {navActions.demo.label}
-            </Button>
-          </span>
+          <Button href={navActions.demo.href} variant="ghost" size="sm">
+            <span className="lg:hidden">Demo</span>
+            <span className="max-lg:hidden">{navActions.demo.label}</span>
+          </Button>
         </div>
       </Container>
 
