@@ -3,15 +3,30 @@
 import { ArrowUp, Mail } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 
-import { FacebookIcon, LinkedinIcon, TelegramIcon } from "@/components/ui/brand-icons";
+import {
+  FacebookIcon,
+  LinkedinIcon,
+  TelegramIcon,
+} from "@/components/ui/brand-icons";
 import { Button } from "@/components/ui/button";
 import { Magnetic } from "@/components/ui/magnetic";
 
 import { FooterEmail } from "./footer-email";
 import { Section } from "@/components/ui/section";
-import { gsap, MOTION_QUERIES, ScrollTrigger, useGSAP } from "@/lib/animations/gsap";
+import {
+  gsap,
+  MOTION_QUERIES,
+  ScrollTrigger,
+  useGSAP,
+} from "@/lib/animations/gsap";
 import { contactEmail, navLinks, socialLinks } from "@/lib/constants/nav";
 
 const MARQUEE = [
@@ -76,7 +91,18 @@ export function SiteFooter() {
     const el = footer.current;
     if (!el) return;
     const wide = window.matchMedia("(min-width: 62.5rem)");
-    const decide = () => setCurtain(wide.matches && el.scrollHeight <= window.innerHeight);
+    // Measure the in-flow content only. scrollHeight would also count the
+    // wordmark, which is absolutely positioned and deliberately sunk below
+    // the bottom edge.
+    const contentHeight = () =>
+      Array.from(el.children).reduce((sum, child) => {
+        const c = child as HTMLElement;
+        return getComputedStyle(c).position === "absolute"
+          ? sum
+          : sum + c.offsetHeight;
+      }, 0);
+    const decide = () =>
+      setCurtain(wide.matches && contentHeight() <= window.innerHeight);
     decide();
     const observer = new ResizeObserver(decide);
     observer.observe(el);
@@ -95,7 +121,8 @@ export function SiteFooter() {
         trigger: wrap.current,
         start: "top bottom",
         end: "bottom top",
-        onToggle: (self) => footer.current?.toggleAttribute("data-onscreen", self.isActive),
+        onToggle: (self) =>
+          footer.current?.toggleAttribute("data-onscreen", self.isActive),
       });
 
       gsap.matchMedia().add(MOTION_QUERIES.motionOK, () => {
@@ -107,7 +134,12 @@ export function SiteFooter() {
             scale: 1,
             opacity: 1,
             ease: "power1.out",
-            scrollTrigger: { trigger: wrap.current, start: "top 80%", end: "bottom bottom", scrub: 1 },
+            scrollTrigger: {
+              trigger: wrap.current,
+              start: "top 80%",
+              end: "bottom bottom",
+              scrub: 1,
+            },
           },
         );
         gsap.fromTo(
@@ -118,7 +150,12 @@ export function SiteFooter() {
             opacity: 1,
             stagger: 0.15,
             ease: "power3.out",
-            scrollTrigger: { trigger: wrap.current, start: "top 40%", end: "bottom bottom", scrub: 1 },
+            scrollTrigger: {
+              trigger: wrap.current,
+              start: "top 40%",
+              end: "bottom bottom",
+              scrub: 1,
+            },
           },
         );
       });
@@ -157,7 +194,9 @@ export function SiteFooter() {
         onPointerMove={spotlight}
         onPointerLeave={spotlightOff}
         className={`group flex w-full flex-col bg-night text-white ${
-          curtain ? "fixed bottom-0 left-0 h-[100dvh]" : "relative min-h-[100dvh]"
+          curtain
+            ? "fixed bottom-0 left-0 h-[100dvh]"
+            : "relative min-h-[100dvh]"
         }`}
       >
         {/* Glow */}
@@ -177,11 +216,11 @@ export function SiteFooter() {
         {/* Wordmark rising from the bottom edge */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-[3vh] left-1/2 -translate-x-1/2 select-none"
+          className="pointer-events-none absolute -bottom-[calc(clamp(96px,26vw,380px)*0.62)] left-1/2 -translate-x-1/2 select-none max-sm:-bottom-[calc(96px*0.35)]"
         >
           <div
             ref={giant}
-            className="relative text-[clamp(96px,21vw,320px)] leading-none font-semibold tracking-[-0.07em] whitespace-nowrap text-white/[0.04] mask-[linear-gradient(180deg,#000_20%,rgba(0,0,0,.1)_90%)] [-webkit-text-stroke:1.5px_rgba(255,255,255,.16)]"
+            className="relative text-[clamp(96px,26vw,380px)] leading-none font-semibold tracking-[-0.07em] whitespace-nowrap text-white/[0.04] mask-[linear-gradient(180deg,#000_30%,rgba(0,0,0,.15)_70%)] [-webkit-text-stroke:1.5px_rgba(255,255,255,.18)]"
             style={{ "--sx": "-999px", "--sy": "-999px" } as CSSProperties}
           >
             EDUSPHERE
@@ -207,7 +246,7 @@ export function SiteFooter() {
         </div>
 
         {/* Closing statement */}
-        <div className="relative z-10 mx-auto flex w-full max-w-[980px] flex-1 flex-col items-center justify-center px-[22px] pt-[150px] pb-8 text-center max-sm:pt-[96px]">
+        <div className="relative z-10 mx-auto flex w-full max-w-[980px] flex-1 flex-col items-center justify-center px-[22px] pt-[150px] pb-6 text-center max-sm:pt-[96px]">
           <div ref={head}>
             <p className="mb-5 text-[13px] font-medium tracking-[0.01em] text-muted-dark">
               One Platform. Complete School Intelligence.
@@ -238,53 +277,67 @@ export function SiteFooter() {
             </div>
             <FooterEmail email={contactEmail} />
 
-            <nav aria-label="Footer" className="flex flex-wrap justify-center gap-2.5">
-              {navLinks.map((link) => (
-                <Magnetic key={link.href} strength={0.2}>
-                  <Link href={link.href} className={pill}>
-                    {link.label}
-                  </Link>
-                </Magnetic>
-              ))}
-              <Magnetic strength={0.2}>
-                <a href={mailto} className={pill}>
-                  Contact
-                </a>
-              </Magnetic>
-            </nav>
-
-            {/* Where to find us */}
-            <ul className="flex items-center gap-2.5" aria-label="Social">
-              {socialLinks.map((s) => {
-                const Icon = SOCIAL_ICONS[s.label];
-                return (
-                  <li key={s.label}>
-                    <Magnetic strength={0.25}>
-                      <a
-                        href={s.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={s.label}
-                        className={iconButton}
-                      >
-                        <Icon className="size-[17px]" />
-                      </a>
-                    </Magnetic>
-                  </li>
-                );
-              })}
-              <li>
-                <Magnetic strength={0.25}>
-                  <a href={mailto} aria-label="Email" className={iconButton}>
-                    <Mail aria-hidden className="size-[18px]" strokeWidth={1.75} />
+            <div className="flex flex-col items-center gap-5 md:flex-row md:gap-4">
+              <nav
+                aria-label="Footer"
+                className="flex flex-wrap justify-center gap-2.5"
+              >
+                {navLinks.map((link) => (
+                  <Magnetic key={link.href} strength={0.2}>
+                    <Link href={link.href} className={pill}>
+                      {link.label}
+                    </Link>
+                  </Magnetic>
+                ))}
+                <Magnetic strength={0.2}>
+                  <a href={mailto} className={pill}>
+                    Contact
                   </a>
                 </Magnetic>
-              </li>
-            </ul>
+              </nav>
+
+              <span
+                aria-hidden
+                className="hidden h-6 w-px bg-white/15 md:block"
+              />
+
+              {/* Where to find us */}
+              <ul className="flex items-center gap-2.5" aria-label="Social">
+                {socialLinks.map((s) => {
+                  const Icon = SOCIAL_ICONS[s.label];
+                  return (
+                    <li key={s.label}>
+                      <Magnetic strength={0.25}>
+                        <a
+                          href={s.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={s.label}
+                          className={iconButton}
+                        >
+                          <Icon className="size-[17px]" />
+                        </a>
+                      </Magnetic>
+                    </li>
+                  );
+                })}
+                <li>
+                  <Magnetic strength={0.25}>
+                    <a href={mailto} aria-label="Email" className={iconButton}>
+                      <Mail
+                        aria-hidden
+                        className="size-[18px]"
+                        strokeWidth={1.75}
+                      />
+                    </a>
+                  </Magnetic>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 
-        {/* Legal row */}
+        {/* Legal row. Sits above the wordmark band, never on it. */}
         <div className="relative z-20 flex w-full flex-col items-center justify-between gap-5 px-[22px] pb-[calc(env(safe-area-inset-bottom,0px)+28px)] md:flex-row md:px-12">
           <p className="order-2 text-[10px] font-medium tracking-[0.18em] text-muted-dark-2 uppercase md:order-1 md:text-[11px]">
             © 2026 EduSphere AI. All rights reserved.
@@ -313,6 +366,11 @@ export function SiteFooter() {
             </button>
           </Magnetic>
         </div>
+        {/* The band the wordmark rises into. Content stops here. */}
+        <div
+          aria-hidden
+          className="h-[calc(clamp(96px,26vw,380px)*0.26)] w-full shrink-0 max-sm:h-[60px]"
+        />
       </footer>
     </Section>
   );
