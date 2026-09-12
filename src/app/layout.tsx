@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 
 import { MotionProvider } from "@/components/motion/motion-provider";
-import { siteConfig } from "@/lib/constants/site";
+import { organizationSchema, siteConfig } from "@/lib/constants/site";
 
 import "./globals.css";
 
@@ -43,6 +43,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={inter.variable}>
       <body>
         <MotionProvider>{children}</MotionProvider>
+        <script
+          type="application/ld+json"
+          // Static, server-built JSON from our own constants; no user input.
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema()) }}
+        />
       </body>
     </html>
   );

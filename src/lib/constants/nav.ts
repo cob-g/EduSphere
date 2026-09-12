@@ -13,12 +13,16 @@ export const navActions = {
   demo: { label: "Book a demo", href: "#cta" },
 } as const;
 
-export const contactEmail = "hello@edusphere.ai";
+export const contactEmail = "edusphereai.ph@gmail.com";
 
-// Social profiles shown in the footer. Replace the handles once the official
-// accounts exist.
+// Social profiles shown in the footer. Only accounts that actually exist
+// belong here: a link to a profile that 404s reads worse than no link at all,
+// especially one section after the page promises auditability. LinkedIn and
+// Telegram icons are still wired up in the footer's SOCIAL_ICONS map, so
+// adding a row back here is all it takes once those accounts are live.
 export const socialLinks = [
-  { label: "LinkedIn", href: "https://www.linkedin.com/company/edusphere-ai" },
-  { label: "Facebook", href: "https://www.facebook.com/edusphereai" },
-  { label: "Telegram", href: "https://t.me/edusphereai" },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/profile.php?id=61593503322497",
+  },
 ] as const;
