@@ -61,7 +61,7 @@ function MarqueeRun() {
 // so the last section scrolls away and reveals it underneath like a curtain
 // lifting. Anywhere it would not fit (phones, short windows) it simply flows,
 // so nothing can be cut off. Inside: a diagonal marquee of what the platform
-// covers, the closing statement with the demo buttons and the email, and the
+// covers, a short closing line with the demo buttons and the email, and the
 // wordmark rising from the bottom edge. Entrances are scroll-scrubbed;
 // reduced-motion users get the final state.
 export function SiteFooter() {
@@ -234,15 +234,9 @@ export function SiteFooter() {
         {/* Closing statement */}
         <div className="relative z-10 mx-auto flex w-full max-w-[980px] flex-1 flex-col items-center justify-center px-[22px] pt-[150px] pb-8 text-center max-sm:pt-[96px] lg:pb-[16vh]">
           <div ref={head}>
-            <p className="mb-5 text-[13px] font-medium tracking-[0.01em] text-muted-dark">
-              One Platform. Complete School Intelligence.
-            </p>
-            <h2 className="text-display-2 mx-auto max-w-[900px] text-shadow-[0_0_60px_rgba(255,255,255,.18)] [@media(max-height:760px)]:text-[clamp(40px,5.5vw,64px)]">
-              The school, intelligently connected.
+            <h2 className="mx-auto max-w-[720px] text-[clamp(34px,4.6vw,60px)] leading-[1.02] font-medium tracking-[-0.04em] text-balance text-white">
+              Ready when your school is.
             </h2>
-            <p className="text-lead mx-auto mt-6 max-w-[640px] text-muted-dark">
-              See what EduSphere can look like inside your institution.
-            </p>
           </div>
 
           <div
