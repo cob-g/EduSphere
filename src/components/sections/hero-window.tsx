@@ -151,7 +151,7 @@ export function HeroWindow() {
         initial={{ opacity: 0, y: 56 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.5 }}
-        className="relative h-[620px] overflow-hidden rounded-[30px] text-ink shadow-[0_50px_120px_rgba(0,0,0,.14),0_14px_34px_rgba(0,0,0,.06),inset_0_1px_0_#fff,inset_0_0_0_1px_rgba(255,255,255,.7)] max-sm:h-[600px] max-sm:rounded-[22px] [-webkit-box-reflect:below_2px_linear-gradient(transparent_74%,rgba(0,0,0,.13))]"
+        className="relative h-[620px] overflow-hidden rounded-[30px] text-ink shadow-[0_50px_120px_rgba(0,0,0,.14),0_14px_34px_rgba(0,0,0,.06),inset_0_1px_0_#fff,inset_0_0_0_1px_rgba(255,255,255,.7)] max-sm:h-[600px] max-sm:rounded-[22px] sm:[-webkit-box-reflect:below_2px_linear-gradient(transparent_74%,rgba(0,0,0,.13))]"
       >
         {/* App chrome */}
         <div

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 
 // ---------------------------------------------------------------------------
 // Hero atmosphere — the world behind the device, in daylight.
@@ -22,6 +22,97 @@ const GRAIN = `url("data:image/svg+xml,${encodeURIComponent(
     `<feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .5 0'/></filter>` +
     `<rect width='100%' height='100%' filter='url(#n)'/></svg>`,
 )}")`;
+
+// ---------------------------------------------------------------------------
+// Rocky ridgelines, baked.
+//
+// These silhouettes used to be smooth polylines roughened at paint time by an
+// feTurbulence + feDisplacementMap filter. That looked right but cost a full
+// offscreen render pass per range on every scrolled frame, which is what made
+// the hero drop frames on phones. The same shape is now generated once as
+// plain geometry: each ridgeline is resampled densely and every sample is
+// pushed around by seeded fractal noise, so the fill is an ordinary path with
+// no filter attached. The generator is deterministic, so the server and the
+// client produce identical markup.
+// ---------------------------------------------------------------------------
+
+type Point = readonly [number, number];
+
+/** Small deterministic PRNG (mulberry32). */
+function rng(seed: number) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * Seeded fractal value noise over a 1D domain, returning roughly -1..1.
+ * Three octaves matches the numOctaves="3" the old filter used.
+ */
+function fractalNoise(seed: number, wavelength: number, octaves = 3) {
+  const next = rng(seed);
+  const table = Array.from({ length: 512 }, () => next() * 2 - 1);
+  const at = (i: number) => table[((i % 512) + 512) % 512];
+  const smooth = (t: number) => t * t * (3 - 2 * t);
+  return (x: number) => {
+    let value = 0;
+    let amplitude = 1;
+    let total = 0;
+    let step = wavelength;
+    for (let o = 0; o < octaves; o++) {
+      const u = x / step;
+      const i = Math.floor(u);
+      const f = smooth(u - i);
+      value += (at(i) * (1 - f) + at(i + 1) * f) * amplitude;
+      total += amplitude;
+      amplitude *= 0.5;
+      step *= 0.5;
+    }
+    return value / total;
+  };
+}
+
+/**
+ * Resample a ridgeline and displace each sample with fractal noise, then close
+ * the shape with its straight bottom edge. `amp` mirrors the old filter's
+ * displacement scale; x displacement tapers to nothing at the two ends so the
+ * silhouette still meets the edges of its box cleanly.
+ */
+function roughRidge(top: readonly Point[], close: readonly Point[], amp: number, seed: number) {
+  const noiseY = fractalNoise(seed, 84);
+  const noiseX = fractalNoise(seed + 977, 84);
+  const span = top[top.length - 1][0] - top[0][0];
+  const out: string[] = [];
+
+  for (let i = 0; i < top.length - 1; i++) {
+    const [x1, y1] = top[i];
+    const [x2, y2] = top[i + 1];
+    const segments = Math.max(2, Math.round(Math.abs(x2 - x1) / 7));
+    for (let s = 0; s < segments; s++) {
+      const t = s / segments;
+      const x = x1 + (x2 - x1) * t;
+      const y = y1 + (y2 - y1) * t;
+      // Fade the sideways push out at both ends of the range.
+      const edge = Math.min(1, (Math.min(x - top[0][0], span - (x - top[0][0])) / span) * 6);
+      const dx = noiseX(x) * amp * 0.5 * edge;
+      const dy = noiseY(x) * amp * 0.58;
+      out.push(`${(x + dx).toFixed(1)} ${(y + dy).toFixed(1)}`);
+    }
+  }
+  const [lastX, lastY] = top[top.length - 1];
+  out.push(`${lastX} ${(lastY + noiseY(lastX) * amp * 0.58).toFixed(1)}`);
+
+  return (
+    `M${out[0]}` +
+    out.slice(1).map((pt) => `L${pt}`).join("") +
+    close.map(([x, y]) => `L${x} ${y}`).join("") +
+    "Z"
+  );
+}
 
 // Cloud layers in the upper sky: soft white masses over a pale grey sky.
 const CLOUDS = [
@@ -59,28 +150,45 @@ const CLOUDS = [
 // ridgeline is roughened by a turbulence-driven displacement so the silhouettes
 // read as rock, not bezier curves. Farther ranges are lighter and blurrier
 // (atmospheric perspective).
+const RIDGE_FOOT: readonly Point[] = [
+  [1440, 560],
+  [0, 560],
+];
+
 const RIDGES = [
   {
     key: "ridge-mid",
     top: "43%",
     height: "38%",
-    d: "M0 260 L120 300 L240 224 L360 282 L470 206 L590 270 L720 196 L840 262 L960 216 L1090 286 L1200 230 L1320 292 L1440 240 L1440 560 L0 560 Z",
+    d: roughRidge(
+      [
+        [0, 260], [120, 300], [240, 224], [360, 282], [470, 206], [590, 270], [720, 196],
+        [840, 262], [960, 216], [1090, 286], [1200, 230], [1320, 292], [1440, 240],
+      ],
+      RIDGE_FOOT,
+      26,
+      7,
+    ),
     from: "#c9cad2",
     to: "#b3b4bd",
     blur: 0.6,
-    rough: 26,
-    seed: 7,
   },
   {
     key: "ridge-near",
     top: "55%",
     height: "36%",
-    d: "M0 250 L130 290 L260 232 L380 296 L520 244 L640 300 L780 236 L900 292 L1030 250 L1160 306 L1290 258 L1440 300 L1440 560 L0 560 Z",
+    d: roughRidge(
+      [
+        [0, 250], [130, 290], [260, 232], [380, 296], [520, 244], [640, 300], [780, 236],
+        [900, 292], [1030, 250], [1160, 306], [1290, 258], [1440, 300],
+      ],
+      RIDGE_FOOT,
+      30,
+      11,
+    ),
     from: "#aaabb5",
     to: "#91929c",
     blur: 0,
-    rough: 30,
-    seed: 11,
   },
 ] as const;
 
@@ -96,11 +204,20 @@ const FOREGROUND_RIDGE = {
   // parallax never exposes the floor behind it.
   height: "48%",
   viewBox: "0 0 1440 750",
-  d: "M0 180 L90 120 L180 200 L300 262 L420 300 L560 274 L700 312 L840 284 L980 322 L1120 272 L1230 222 L1330 140 L1440 172 L1440 800 L0 800 Z",
+  d: roughRidge(
+    [
+      [0, 180], [90, 120], [180, 200], [300, 262], [420, 300], [560, 274], [700, 312],
+      [840, 284], [980, 322], [1120, 272], [1230, 222], [1330, 140], [1440, 172],
+    ],
+    [
+      [1440, 800],
+      [0, 800],
+    ],
+    30,
+    17,
+  ),
   from: "#9a9ba5",
   to: "#66676f",
-  rough: 30,
-  seed: 17,
 } as const;
 
 const FOREGROUND_FOG = { key: "fog-fore", height: "18%", alpha: 0.8, blur: 30 } as const;
@@ -129,18 +246,19 @@ export function HeroAtmosphere() {
           data-hero={layer.key}
           data-drift={layer.drift}
           data-period={layer.period}
-          className="absolute -inset-x-[12%]"
+          className="absolute -inset-x-[12%] [filter:blur(var(--hero-blur))] max-sm:[filter:blur(var(--hero-blur-sm))]"
           style={{
             top: layer.top,
             height: layer.height,
-            filter: `blur(${layer.blur}px)`,
+            "--hero-blur": `${layer.blur}px`,
+            "--hero-blur-sm": `${Math.round(layer.blur * 0.45)}px`,
             background: layer.spots
               .map(
                 ([x, y, w, h, a]) =>
                   `radial-gradient(${w}% ${h}% at ${x}% ${y}%, rgba(255,255,255,${a}), transparent 68%)`,
               )
               .join(","),
-          }}
+          } as CSSProperties}
         />
       ))}
 
@@ -153,7 +271,7 @@ export function HeroAtmosphere() {
             data-hero={ridge.key}
             viewBox="0 0 1440 500"
             preserveAspectRatio="none"
-            className="absolute -inset-x-[3%] w-[106%]"
+            className="absolute -inset-x-[3%] w-[106%] max-sm:[filter:none]"
             style={{
               top: ridge.top,
               height: ridge.height,
@@ -165,38 +283,23 @@ export function HeroAtmosphere() {
                 <stop offset="0" stopColor={ridge.from} />
                 <stop offset="1" stopColor={ridge.to} />
               </linearGradient>
-              <filter id={`${ridge.key}-rough`} x="-5%" y="-15%" width="110%" height="130%">
-                <feTurbulence
-                  type="fractalNoise"
-                  baseFrequency="0.012 0.03"
-                  numOctaves="3"
-                  seed={ridge.seed}
-                  result="noise"
-                />
-                <feDisplacementMap
-                  in="SourceGraphic"
-                  in2="noise"
-                  scale={ridge.rough}
-                  xChannelSelector="R"
-                  yChannelSelector="G"
-                />
-              </filter>
             </defs>
-            <path d={ridge.d} fill={`url(#${ridge.key}-g)`} filter={`url(#${ridge.key}-rough)`} />
+            <path d={ridge.d} fill={`url(#${ridge.key}-g)`} />
           </svg>
           {FOG[i] && (
             <div
               data-hero={FOG[i].key}
-              className="absolute -inset-x-[10%]"
+              className="absolute -inset-x-[10%] [filter:blur(var(--hero-blur))] max-sm:[filter:blur(var(--hero-blur-sm))]"
               style={{
                 top: FOG[i].top,
                 height: FOG[i].height,
-                filter: `blur(${FOG[i].blur}px)`,
+                "--hero-blur": `${FOG[i].blur}px`,
+                "--hero-blur-sm": `${Math.round(FOG[i].blur * 0.5)}px`,
                 background:
                   `radial-gradient(45% 60% at 20% 50%, rgba(255,255,255,${FOG[i].alpha}), transparent 70%),` +
                   `radial-gradient(50% 60% at 60% 55%, rgba(255,255,255,${FOG[i].alpha}), transparent 70%),` +
                   `radial-gradient(40% 60% at 95% 45%, rgba(255,255,255,${FOG[i].alpha}), transparent 70%)`,
-              }}
+              } as CSSProperties}
             />
           )}
         </div>
@@ -210,7 +313,7 @@ export function HeroAtmosphere() {
 
       {/* Film grain */}
       <div
-        className="absolute inset-0 opacity-[.06] mix-blend-multiply"
+        className="absolute inset-0 opacity-[.06] mix-blend-multiply max-sm:hidden"
         style={{ backgroundImage: GRAIN, backgroundSize: "220px 220px" }}
       />
     </div>
@@ -242,43 +345,28 @@ export function HeroForeground() {
             <stop offset="0" stopColor={ridge.from} />
             <stop offset="1" stopColor={ridge.to} />
           </linearGradient>
-          <filter id={`${ridge.key}-rough`} x="-5%" y="-15%" width="110%" height="130%">
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.012 0.03"
-              numOctaves="3"
-              seed={ridge.seed}
-              result="noise"
-            />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="noise"
-              scale={ridge.rough}
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
         </defs>
-        <path d={ridge.d} fill={`url(#${ridge.key}-g)`} filter={`url(#${ridge.key}-rough)`} />
+        <path d={ridge.d} fill={`url(#${ridge.key}-g)`} />
       </svg>
 
       <div
         data-hero={fog.key}
-        className="absolute -inset-x-[10%] top-[81%] max-sm:top-[86%]"
+        className="absolute -inset-x-[10%] top-[81%] [filter:blur(var(--hero-blur))] max-sm:top-[86%] max-sm:[filter:blur(var(--hero-blur-sm))]"
         style={{
           height: fog.height,
-          filter: `blur(${fog.blur}px)`,
+          "--hero-blur": `${fog.blur}px`,
+          "--hero-blur-sm": `${Math.round(fog.blur * 0.5)}px`,
           background:
             `radial-gradient(40% 60% at 10% 55%, rgba(255,255,255,${fog.alpha}), transparent 70%),` +
             `radial-gradient(50% 65% at 45% 60%, rgba(255,255,255,${fog.alpha}), transparent 70%),` +
             `radial-gradient(45% 60% at 80% 50%, rgba(255,255,255,${fog.alpha}), transparent 70%),` +
             `linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(240,241,245,.6) 55%, rgba(236,237,241,.85) 100%)`,
-        }}
+        } as CSSProperties}
       />
 
       {/* Film grain over the foreground too, so it belongs to the same image */}
       <div
-        className="absolute inset-x-0 bottom-0 h-[30%] opacity-[.06] mix-blend-multiply"
+        className="absolute inset-x-0 bottom-0 h-[30%] opacity-[.06] mix-blend-multiply max-sm:hidden"
         style={{ backgroundImage: GRAIN, backgroundSize: "220px 220px" }}
       />
     </div>
@@ -293,8 +381,12 @@ export function HeroForeground() {
 
 type Node = { x: number; y: number; vx: number; vy: number; r: number };
 
-const LINK_DISTANCE = 130;
-const LINK_DISTANCE_SQ = LINK_DISTANCE * LINK_DISTANCE;
+// Same field everywhere — node count and link range are untouched so the
+// constellation looks identical. Phones only pay less per frame: a smaller
+// backing store and half the frame rate, which is where the cost actually was
+// (clearing and repainting a full-DPR canvas sixty times a second).
+const DESKTOP = { maxNodes: 80, areaPerNode: 14000, link: 130, dpr: 2, minFrameMs: 0 };
+const COMPACT = { maxNodes: 80, areaPerNode: 14000, link: 130, dpr: 1.5, minFrameMs: 1000 / 30 };
 
 function Constellation() {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -305,6 +397,8 @@ function Constellation() {
     if (!canvas || !ctx) return;
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const tune = window.matchMedia("(max-width: 42.4375rem)").matches ? COMPACT : DESKTOP;
+    const linkSq = tune.link * tune.link;
     let width = 0;
     let height = 0;
     let nodes: Node[] = [];
@@ -313,7 +407,7 @@ function Constellation() {
     let last = 0;
 
     const seed = () => {
-      const count = Math.round(Math.min(80, (width * height) / 14000));
+      const count = Math.round(Math.min(tune.maxNodes, (width * height) / tune.areaPerNode));
       nodes = Array.from({ length: count }, () => ({
         x: Math.random() * width,
         y: Math.random() * height,
@@ -333,9 +427,9 @@ function Constellation() {
           const dx = a.x - b.x;
           const dy = a.y - b.y;
           const d2 = dx * dx + dy * dy;
-          if (d2 >= LINK_DISTANCE_SQ) continue;
+          if (d2 >= linkSq) continue;
           const d = Math.sqrt(d2);
-          ctx.strokeStyle = `rgba(9,9,11,${(1 - d / LINK_DISTANCE) * 0.16})`;
+          ctx.strokeStyle = `rgba(9,9,11,${(1 - d / tune.link) * 0.16})`;
           ctx.beginPath();
           ctx.moveTo(a.x, a.y);
           ctx.lineTo(b.x, b.y);
@@ -352,7 +446,11 @@ function Constellation() {
 
     // Time-based so 120Hz displays do not drift twice as fast.
     const tick = (now: number) => {
-      const dt = last ? Math.min((now - last) / (1000 / 60), 2) : 1;
+      frame = requestAnimationFrame(tick);
+      if (!last) last = now;
+      const elapsed = now - last;
+      if (elapsed < tune.minFrameMs) return;
+      const dt = Math.min(elapsed / (1000 / 60), 2);
       last = now;
       for (const n of nodes) {
         n.x += n.vx * dt;
@@ -363,7 +461,6 @@ function Constellation() {
         else if (n.y > height + 12) n.y = -12;
       }
       draw();
-      frame = requestAnimationFrame(tick);
     };
 
     const start = () => {
@@ -378,7 +475,7 @@ function Constellation() {
     // does not jump when the window or scrollbar changes.
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, tune.dpr);
       const prevW = width;
       const prevH = height;
       width = rect.width;

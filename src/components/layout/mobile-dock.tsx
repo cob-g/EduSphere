@@ -102,7 +102,7 @@ export function MobileDock() {
       className={`fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+14px)] z-50 flex justify-center px-4 lg:hidden ${hidden ? "pointer-events-none" : ""}`}
     >
       <div
-        className={`flex w-full max-w-[420px] items-stretch gap-1 rounded-[26px] border p-1.5 backdrop-blur-2xl backdrop-saturate-150 transition-colors duration-300 ease-apple ${shell}`}
+        className={`flex w-full max-w-[420px] items-stretch gap-1 rounded-[26px] border p-1.5 backdrop-blur-lg backdrop-saturate-150 transition-colors duration-300 ease-apple ${shell}`}
       >
         {navLinks.map((link) => {
           const Icon = ICONS[link.href] ?? Sparkles;

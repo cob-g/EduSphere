@@ -37,8 +37,13 @@ export function HeroScene() {
       gsap.matchMedia().add(MOTION_QUERIES.motionOK, () => {
         const scrollTrigger = { trigger: root, start: "top top", end: "bottom top", scrub: 1 };
 
+        // One timeline, not one ScrollTrigger per layer: ten triggers all
+        // watching the same range meant ten sets of scroll bookkeeping and
+        // layout reads per frame. Every layer starts at position 0 with the
+        // same duration, so the mapping from scroll to y is unchanged.
+        const drift = gsap.timeline({ scrollTrigger });
         for (const [selector, y] of PARALLAX) {
-          gsap.to(selector, { y, ease: "none", scrollTrigger });
+          drift.to(selector, { y, ease: "none", duration: 1 }, 0);
         }
 
         // Idle drift for the clouds (time-driven, on x — never fights the

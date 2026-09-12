@@ -82,7 +82,7 @@ export function SiteNav() {
       {/* Scrolled backdrop. Taller than the bar so the fade tails off below it. */}
       <div
         aria-hidden
-        className={`pointer-events-none absolute inset-x-0 top-0 h-24 backdrop-blur-[14px] transition-opacity duration-300 ease-apple mask-b-from-60% ${backdropFade[theme]} ${scrolled ? "opacity-100" : "opacity-0"}`}
+        className={`pointer-events-none absolute inset-x-0 top-0 h-24 backdrop-blur-[14px] max-sm:backdrop-blur-[8px] transition-opacity duration-300 ease-apple mask-b-from-60% ${backdropFade[theme]} ${scrolled ? "opacity-100" : "opacity-0"}`}
       />
 
       <Container as="nav" aria-label="Primary" className="relative z-10 flex h-16 items-center justify-between">

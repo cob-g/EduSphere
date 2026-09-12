@@ -44,6 +44,15 @@ export function Sparkles({
     if (!canvas || !ctx) return;
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Phones draw the same field, just more cheaply: a smaller backing store
+    // and half the frame rate, which is where the cost was. Particle count is
+    // untouched so the look does not change. Pointer attraction is pointless
+    // on touch, so those listeners are never attached there.
+    const compact = window.matchMedia("(max-width: 42.4375rem)").matches;
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    const followPointer = mousemove && !coarse;
+    const maxDpr = compact ? 1.5 : 2;
+    const minFrameMs = compact ? 1000 / 30 : 0;
     let width = 0;
     let height = 0;
     let particles: Particle[] = [];
@@ -82,13 +91,17 @@ export function Sparkles({
     // Time-based so 120Hz displays do not run twice as fast (dt is in 60fps
     // frames, capped so a resumed tab does not jump).
     const tick = (now: number) => {
-      const dt = last ? Math.min((now - last) / (1000 / 60), 2) : 1;
+      frame = requestAnimationFrame(tick);
+      if (!last) last = now;
+      const elapsed = now - last;
+      if (elapsed < minFrameMs) return;
+      const dt = Math.min(elapsed / (1000 / 60), 2);
       last = now;
       t += 0.03 * dt;
       for (const p of particles) {
         p.x += p.vx * dt;
         p.y += p.vy * dt;
-        if (mousemove) {
+        if (followPointer) {
           const dx = pointer.x - p.x;
           const dy = pointer.y - p.y;
           const d2 = dx * dx + dy * dy;
@@ -106,7 +119,6 @@ export function Sparkles({
         else if (p.x > width + 4) p.x = -4;
       }
       draw();
-      frame = requestAnimationFrame(tick);
     };
 
     const start = () => {
@@ -121,7 +133,7 @@ export function Sparkles({
     // window change does not teleport the whole field.
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
       const prevW = width;
       const prevH = height;
       width = rect.width;
@@ -165,7 +177,7 @@ export function Sparkles({
     document.addEventListener("visibilitychange", onVisibility);
     // pointerleave does not bubble, so listen on the root element itself.
     const root = document.documentElement;
-    if (mousemove) {
+    if (followPointer) {
       window.addEventListener("pointermove", onMove, { passive: true });
       root.addEventListener("pointerleave", onLeave);
     }
