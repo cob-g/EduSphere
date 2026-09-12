@@ -6,6 +6,7 @@ import { Hero } from "@/components/sections/hero";
 import { LessonFlow } from "@/components/sections/lesson-flow";
 import { Mission } from "@/components/sections/mission";
 import { Modules } from "@/components/sections/modules";
+import { Pricing } from "@/components/sections/pricing";
 import { Trust } from "@/components/sections/trust";
 
 export default function Home() {
@@ -19,6 +20,7 @@ export default function Home() {
         <LessonFlow />
         <Modules />
         <Trust />
+        <Pricing />
       </main>
       <SiteFooter />
       <MobileDock />
