@@ -114,12 +114,12 @@ export function Services() {
             </Reveal>
           </div>
 
-          <div className="grid gap-5">
+          <div className="grid gap-10 lg:gap-14">
             {numbered.map((g, gi) => (
               <Reveal key={g.letter} as="section" delay={gi * 0.05}>
                 <div
                   id={groupId(g)}
-                  className="relative flex min-h-[560px] scroll-mt-[112px] flex-col overflow-hidden rounded-[22px] border border-white/10 bg-[#0b0b0d] p-7 max-sm:min-h-0 md:p-8"
+                  className="relative flex min-h-[520px] scroll-mt-[112px] flex-col overflow-hidden rounded-[22px] border border-white/[0.14] bg-[#111114] p-7 shadow-[0_40px_90px_-40px_rgba(0,0,0,.9)] max-sm:min-h-0 md:p-8"
                 >
                   {/* Light from above, like the AI Teacher stage */}
                   <div
