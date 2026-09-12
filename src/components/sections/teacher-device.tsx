@@ -52,23 +52,23 @@ export function TeacherDevice() {
   return (
     <div
       ref={ref}
-      className="ring-device-dark grid h-[610px] w-[min(1000px,calc(100%-34px))] grid-cols-[1.2fr_.8fr] overflow-hidden rounded-device border border-white/15 will-change-transform max-[1000px]:h-auto max-[1000px]:grid-cols-1 max-[680px]:w-[calc(100%-22px)] max-[680px]:rounded-[30px]"
+      className="ring-device-dark grid h-[610px] w-[min(1000px,calc(100%-34px))] grid-cols-[1.2fr_.8fr] overflow-hidden rounded-device border border-white/15 will-change-transform max-lg:h-auto max-lg:grid-cols-1 max-sm:w-[calc(100%-22px)] max-sm:rounded-[30px]"
       style={{ background: "linear-gradient(145deg,#0d0f14,#050506)" }}
     >
       {/* Lesson stage */}
       <div
         aria-hidden
-        className="relative grid place-items-center border-r border-[#20242b] max-[1000px]:min-h-[420px] max-[1000px]:border-r-0 max-[1000px]:border-b max-[680px]:min-h-[320px]"
+        className="relative grid place-items-center border-r border-[#20242b] max-lg:min-h-[420px] max-lg:border-r-0 max-lg:border-b max-sm:min-h-[320px]"
         style={{
           background:
             "radial-gradient(circle at 45% 35%,rgba(255,255,255,.09),transparent 34%)," +
             "linear-gradient(160deg,#15161b,#07080b 60%)",
         }}
       >
-        <div className="relative aspect-[16/10] w-[74%] -translate-y-2.5 rounded-panel bg-white p-[31px] text-[#0b0b0c] shadow-[0_32px_70px_rgba(0,0,0,.42)] max-[680px]:w-[82%] max-[680px]:p-[22px]">
+        <div className="relative aspect-[16/10] w-[74%] -translate-y-2.5 rounded-panel bg-white p-[31px] text-[#0b0b0c] shadow-[0_32px_70px_rgba(0,0,0,.42)] max-sm:w-[82%] max-sm:p-[22px]">
           <div>
             <small className="text-[9px] text-muted">GRADE 8 • MATHEMATICS</small>
-            <h3 className="mt-[18px] mb-3 text-[35px] leading-none font-semibold tracking-[-0.04em] max-[680px]:text-[27px]">
+            <h3 className="mt-[18px] mb-3 text-[35px] leading-none font-semibold tracking-[-0.04em] max-sm:text-[27px]">
               Pythagorean Theorem
             </h3>
             <p className="max-w-[58%] text-[13px] leading-[1.55] text-[#68686d]">
@@ -77,13 +77,13 @@ export function TeacherDevice() {
           </div>
           {/* Right triangle */}
           <div
-            className="absolute right-[29px] bottom-[27px] size-0 border-b-[108px] border-l-[140px] border-b-[#e8e8ec] border-l-transparent drop-shadow-[0_12px_18px_rgba(0,0,0,.08)] max-[680px]:border-b-[76px] max-[680px]:border-l-[98px]"
+            className="absolute right-[29px] bottom-[27px] size-0 border-b-[108px] border-l-[140px] border-b-[#e8e8ec] border-l-transparent drop-shadow-[0_12px_18px_rgba(0,0,0,.08)] max-sm:border-b-[76px] max-sm:border-l-[98px]"
           />
         </div>
 
         {/* AI avatar */}
         <div
-          className="absolute right-[8%] bottom-[8%] grid size-[138px] place-items-center rounded-full border border-white/50 text-[44px] font-semibold tracking-[-0.04em] text-[#0a0a0b] shadow-[0_0_75px_rgba(255,255,255,.12)] max-[680px]:size-[94px] max-[680px]:text-[30px]"
+          className="absolute right-[8%] bottom-[8%] grid size-[138px] place-items-center rounded-full border border-white/50 text-[44px] font-semibold tracking-[-0.04em] text-[#0a0a0b] shadow-[0_0_75px_rgba(255,255,255,.12)] max-sm:size-[94px] max-sm:text-[30px]"
           style={{ background: "radial-gradient(circle at 45% 35%,#f2f2f5,#8e8e96 55%,#26262b)" }}
         >
           AI
@@ -91,7 +91,7 @@ export function TeacherDevice() {
       </div>
 
       {/* Tutor panel */}
-      <div className="flex flex-col p-[30px] max-[1000px]:min-h-[420px]">
+      <div className="flex flex-col p-[30px] max-lg:min-h-[420px]">
         <Eyebrow className="mb-5">AI Teacher Mode</Eyebrow>
 
         <motion.div

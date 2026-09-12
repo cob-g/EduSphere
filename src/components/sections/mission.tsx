@@ -8,7 +8,7 @@ import { MissionStatement } from "./mission-statement";
 // Band 2: full-bleed black statement.
 export function Mission() {
   return (
-    <Section theme="dark" tone="night" className="py-[180px] max-[680px]:py-[130px]">
+    <Section theme="dark" tone="night" className="py-[180px] max-sm:py-[130px]">
       <Container>
         <Reveal>
           <Eyebrow>The idea</Eyebrow>

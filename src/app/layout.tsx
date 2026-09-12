@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 
 import { MotionProvider } from "@/components/motion/motion-provider";
@@ -30,6 +30,12 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     url: "/",
   },
+};
+
+// Let the page extend under the home indicator so the phone dock can respect
+// env(safe-area-inset-bottom).
+export const viewport: Viewport = {
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

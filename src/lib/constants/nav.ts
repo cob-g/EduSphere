@@ -7,7 +7,9 @@ export const navLinks = [
 ] as const;
 
 export const navActions = {
-  signIn: { label: "Sign in", href: "#footer" },
+  // Placeholder until the app has a login URL. Must target an in-flow element
+  // (the footer itself is position: fixed, so a hash to it never scrolls).
+  signIn: { label: "Sign in", href: "#cta" },
   demo: { label: "Book a demo", href: "#cta" },
 } as const;
 

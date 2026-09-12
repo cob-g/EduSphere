@@ -21,7 +21,7 @@ export function Magnetic({ children, strength = 0.35, className = "" }: Magnetic
     () => {
       const el = ref.current;
       if (!el) return;
-      gsap.matchMedia().add(MOTION_QUERIES.motionOK, () => {
+      gsap.matchMedia().add(`${MOTION_QUERIES.motionOK} and ${MOTION_QUERIES.finePointer}`, () => {
         const onMove = (e: MouseEvent) => {
           const r = el.getBoundingClientRect();
           const x = e.clientX - r.left - r.width / 2;

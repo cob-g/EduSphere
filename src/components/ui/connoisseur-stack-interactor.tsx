@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
+import Image from "next/image";
 import { useId, useRef, useState } from "react";
 
 import { gsap, MOTION_QUERIES, useGSAP } from "@/lib/animations/gsap";
@@ -21,9 +22,9 @@ export type StackItem = {
   /** Two words render on two lines, as in the original. */
   name: string;
   description?: string;
-  /** A photograph (SVG image mode)… */
+  /** A photograph, served through next/image and lazy-loaded… */
   image?: string;
-  /** …or any markup, clipped by the same shapes (HTML mode). */
+  /** …or any markup, clipped by the same shapes. */
   visual?: React.ReactNode;
   layout: StackLayout;
 };
@@ -103,17 +104,16 @@ export default function StackInteractor({ items, className = "", grayscale = tru
         gsap.set(`#${clipId(items[active].layout)} .piece`, { scale: 1, transformOrigin: "50% 50%" });
       });
     },
-    { scope, dependencies: [active] },
+    { scope, dependencies: [active], revertOnUpdate: true },
   );
 
   const item = items[active];
-  const htmlMode = items.some((it) => it.visual);
 
   return (
     <div ref={scope} className={`flex flex-col items-center gap-16 md:flex-row md:justify-between ${className}`}>
       {/* List */}
       <nav className="w-full md:w-1/2" aria-label="Steps">
-        <ul className="flex flex-col gap-9 max-[680px]:gap-7">
+        <ul className="flex flex-col gap-9 max-sm:gap-7">
           {items.map((it, i) => {
             const on = i === active;
             const [first, ...rest] = it.name.split(" ");
@@ -124,7 +124,7 @@ export default function StackInteractor({ items, className = "", grayscale = tru
                   onMouseEnter={() => setActive(i)}
                   onFocus={() => setActive(i)}
                   onClick={() => setActive(i)}
-                  aria-pressed={on}
+                  aria-current={on ? "true" : undefined}
                   className="group flex w-full items-start gap-5 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current"
                 >
                   <span
@@ -179,55 +179,46 @@ export default function StackInteractor({ items, className = "", grayscale = tru
           aria-hidden
           className="absolute h-[110%] w-[110%] rounded-full bg-black/[0.06] blur-[100px] [[data-theme=dark]_&]:bg-white/[0.05]"
         />
-        {htmlMode ? (
-          <div className="relative z-10 aspect-square w-full max-w-[520px]">
-            {/* Clip definitions in bounding-box units so they fit any panel size. */}
-            <svg className="absolute size-0" aria-hidden>
-              <defs>
-                {(Object.keys(LAYOUTS) as StackLayout[]).map((layout) => (
-                  <clipPath
-                    key={layout}
-                    id={clipId(layout)}
-                    clipPathUnits="objectBoundingBox"
-                    transform="scale(0.002)"
-                  >
-                    {LAYOUTS[layout]}
-                  </clipPath>
-                ))}
-              </defs>
-            </svg>
-            <div
-              className="absolute inset-0 drop-shadow-[0_30px_60px_rgba(0,0,0,.18)]"
-              style={{ clipPath: `url(#${clipId(item.layout)})` }}
-            >
-              {item.visual}
-            </div>
-          </div>
-        ) : (
-          <svg
-            viewBox="0 0 500 500"
-            className="relative z-10 h-auto w-full max-w-[500px] drop-shadow-[0_30px_60px_rgba(0,0,0,.18)]"
-            role="img"
-            aria-label={item.name}
-          >
+        <div className="relative z-10 aspect-square w-full max-w-[520px]">
+          {/* Clip definitions in bounding-box units so they fit any panel size. */}
+          <svg className="absolute size-0" aria-hidden>
             <defs>
               {(Object.keys(LAYOUTS) as StackLayout[]).map((layout) => (
-                <clipPath key={layout} id={clipId(layout)}>
+                <clipPath
+                  key={layout}
+                  id={clipId(layout)}
+                  clipPathUnits="objectBoundingBox"
+                  transform="scale(0.002)"
+                >
                   {LAYOUTS[layout]}
                 </clipPath>
               ))}
             </defs>
-            <g clipPath={`url(#${clipId(item.layout)})`}>
-              <image
-                href={item.image}
-                width="500"
-                height="500"
-                preserveAspectRatio="xMidYMid slice"
-                style={grayscale ? { filter: "grayscale(1) contrast(1.05)" } : undefined}
-              />
-            </g>
           </svg>
-        )}
+          <div
+            className="absolute inset-0 drop-shadow-[0_30px_60px_rgba(0,0,0,.18)]"
+            style={{ clipPath: `url(#${clipId(item.layout)})` }}
+            role="img"
+            aria-label={item.name}
+          >
+            {/* Every photograph stays mounted (transparent when inactive) so
+                the browser fetches them as the section approaches, sized for
+                the panel, and a first hover never shows an empty clip. */}
+            {items.map((it, i) =>
+              it.image ? (
+                <Image
+                  key={it.image}
+                  src={it.image}
+                  alt=""
+                  fill
+                  sizes="(max-width: 48rem) calc(100vw - 44px), 520px"
+                  className={`object-cover ${grayscale ? "grayscale contrast-105" : ""} ${i === active ? "" : "opacity-0"}`}
+                />
+              ) : null,
+            )}
+            {item.visual}
+          </div>
+        </div>
       </div>
     </div>
   );

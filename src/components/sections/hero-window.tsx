@@ -12,9 +12,9 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // ---------------------------------------------------------------------------
 // The device: a light glass slab standing on the studio floor, with a contact
@@ -109,45 +109,53 @@ const swap = {
   transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const },
 };
 
+// The mock is decorative: one accessible name for the whole slab, and the
+// rotating contents inside are hidden from assistive tech so they never read
+// out (or re-read every few seconds).
 export function HeroWindow() {
+  const frame = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
+  const inView = useInView(frame, { amount: 0.25 });
   const [index, setIndex] = useState(0);
   const school = SCHOOLS[index];
 
+  // Rotate schools only while the slab is on screen and the tab is visible.
   useEffect(() => {
-    if (reduceMotion) return;
-    const id = window.setInterval(() => setIndex((i) => (i + 1) % SCHOOLS.length), ROTATE_MS);
+    if (reduceMotion || !inView) return;
+    const tick = () => {
+      if (!document.hidden) setIndex((i) => (i + 1) % SCHOOLS.length);
+    };
+    const id = window.setInterval(tick, ROTATE_MS);
     return () => window.clearInterval(id);
-  }, [reduceMotion]);
+  }, [reduceMotion, inView]);
 
   return (
     <div
+      ref={frame}
       data-hero="window"
-      className="relative mx-auto mt-[72px] w-[min(1040px,calc(100%-24px))] max-[680px]:mt-12"
+      role="img"
+      aria-label="EduSphere teaching workspace showing lessons, AI approvals and an AI insight"
+      className="relative mx-auto mt-[72px] w-[min(1040px,calc(100%-24px))] max-sm:mt-12"
     >
       {/* Contact shadow on the floor */}
       <div
         aria-hidden
-        className="absolute inset-x-[8%] -bottom-10 h-24 rounded-[50%] blur-2xl"
-        style={{ background: "radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,.30), transparent 70%)" }}
+        className="absolute inset-x-[8%] -bottom-10 h-24 rounded-[50%] bg-[radial-gradient(50%_50%_at_50%_50%,rgba(0,0,0,.30),transparent_70%)] blur-2xl"
       />
 
+      {/* Entrance: MotionConfig reducedMotion="user" already drops the travel
+          for reduced-motion users, so no conditional initial (a conditional
+          would differ between server and first client render). */}
       <motion.div
-        initial={reduceMotion ? false : { opacity: 0, y: 56 }}
+        aria-hidden
+        initial={{ opacity: 0, y: 56 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.5 }}
-        className="relative h-[620px] overflow-hidden rounded-[30px] text-ink max-[680px]:h-[600px] max-[680px]:rounded-[22px]"
-        style={{
-          background: "transparent",
-          boxShadow:
-            "0 50px 120px rgba(0,0,0,.14), 0 14px 34px rgba(0,0,0,.06), inset 0 1px 0 #fff, inset 0 0 0 1px rgba(255,255,255,.7)",
-          WebkitBoxReflect: "below 2px linear-gradient(transparent 74%, rgba(0,0,0,.13))",
-        }}
+        className="relative h-[620px] overflow-hidden rounded-[30px] text-ink shadow-[0_50px_120px_rgba(0,0,0,.14),0_14px_34px_rgba(0,0,0,.06),inset_0_1px_0_#fff,inset_0_0_0_1px_rgba(255,255,255,.7)] max-sm:h-[600px] max-sm:rounded-[22px] [-webkit-box-reflect:below_2px_linear-gradient(transparent_74%,rgba(0,0,0,.13))]"
       >
         {/* App chrome */}
         <div
-          className="relative flex h-[58px] items-center gap-3 px-5 text-white max-[680px]:px-4"
-          style={{ background: "rgba(42,39,37,.9)" }}
+          className="relative flex h-[58px] items-center gap-3 px-5 text-white max-sm:px-4 bg-[rgba(42,39,37,.9)]"
         >
           <span className="flex items-center gap-2">
             <Image
@@ -155,10 +163,10 @@ export function HeroWindow() {
               alt=""
               width={952}
               height={777}
+              sizes="28px"
               className="h-[22px] w-auto"
-              loading="eager"
             />
-            <span className="text-[13px] font-semibold tracking-[-0.02em] max-[680px]:hidden">
+            <span className="text-[13px] font-semibold tracking-[-0.02em] max-sm:hidden">
               EduSphere
             </span>
           </span>
@@ -172,7 +180,7 @@ export function HeroWindow() {
             <ChevronDown aria-hidden className="size-3.5 text-white/60" />
           </span>
 
-          <Search aria-hidden className="ml-1 size-4 text-white/55 max-[680px]:hidden" />
+          <Search aria-hidden className="ml-1 size-4 text-white/55 max-sm:hidden" />
 
           <span className="ml-auto inline-flex items-center gap-2 text-[11px] text-white/60">
             <i className="size-1.5 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,.9)]" />
@@ -184,14 +192,13 @@ export function HeroWindow() {
           </span>
         </div>
 
-        <div className="grid h-[calc(100%-58px)] grid-cols-[200px_1fr] max-[680px]:grid-cols-1">
+        <div className="grid h-[calc(100%-58px)] grid-cols-[200px_1fr] max-sm:grid-cols-1">
           {/* Sidebar. The active item is a tab that merges into the content pane:
               it runs past the sidebar's edge and two small corner pieces carve
               the concave curves above and below it. */}
           <nav
             aria-hidden
-            className="py-4 pl-3 max-[680px]:hidden"
-            style={{ background: "linear-gradient(180deg, rgba(42,39,37,.9) 0%, rgba(26,24,23,.93) 100%)" }}
+            className="bg-[linear-gradient(180deg,rgba(42,39,37,.9)_0%,rgba(26,24,23,.93)_100%)] py-4 pl-3 max-sm:hidden"
           >
             {SIDEBAR.map(({ label, icon: Icon }, i) => (
               <div
@@ -204,14 +211,8 @@ export function HeroWindow() {
               >
                 {i === ACTIVE && (
                   <>
-                    <span
-                      className="absolute -top-[14px] right-0 size-[14px]"
-                      style={{ background: "radial-gradient(circle at 0 0, transparent 13.5px, #fff 14px)" }}
-                    />
-                    <span
-                      className="absolute -bottom-[14px] right-0 size-[14px]"
-                      style={{ background: "radial-gradient(circle at 0 100%, transparent 13.5px, #fff 14px)" }}
-                    />
+                    <span className="absolute -top-[14px] right-0 size-[14px] bg-[radial-gradient(circle_at_0_0,transparent_13.5px,#fff_14px)]" />
+                    <span className="absolute -bottom-[14px] right-0 size-[14px] bg-[radial-gradient(circle_at_0_100%,transparent_13.5px,#fff_14px)]" />
                   </>
                 )}
                 <Icon aria-hidden className="size-[15px]" strokeWidth={1.75} />
@@ -221,7 +222,7 @@ export function HeroWindow() {
           </nav>
 
           {/* Teaching workspace */}
-          <div className="relative bg-white p-6 max-[680px]:p-4">
+          <div className="relative bg-white p-6 max-sm:p-4">
             <div className="flex items-end justify-between">
               <div>
                 <AnimatePresence mode="wait" initial={false}>
@@ -234,27 +235,27 @@ export function HeroWindow() {
                   </motion.small>
                 </AnimatePresence>
                 <AnimatePresence mode="wait" initial={false}>
-                  <motion.h3
+                  <motion.p
                     key={school.teacher}
                     {...swap}
                     className="mt-1 text-[20px] font-semibold tracking-[-0.03em]"
                   >
                     {school.teacher}
-                  </motion.h3>
+                  </motion.p>
                 </AnimatePresence>
               </div>
-              <span className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-pill bg-[rgba(42,39,37,.9)] px-3 text-[11px] font-medium whitespace-nowrap text-white max-[680px]:hidden">
+              <span className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-pill bg-[rgba(42,39,37,.9)] px-3 text-[11px] font-medium whitespace-nowrap text-white max-sm:hidden">
                 <Plus aria-hidden className="size-3.5" strokeWidth={2.2} />
                 Upload lesson
               </span>
             </div>
 
-            <div className="mt-5 grid grid-cols-3 gap-2.5 max-[680px]:grid-cols-2">
+            <div className="mt-5 grid grid-cols-3 gap-2.5 max-sm:grid-cols-2">
               {school.kpis.map(([label, value], i) => (
                 <div
                   key={label}
                   className={`rounded-[14px] border border-black/[0.06] bg-white p-3.5 shadow-[0_1px_2px_rgba(0,0,0,.03)] ${
-                    i === 2 ? "max-[680px]:hidden" : ""
+                    i === 2 ? "max-sm:hidden" : ""
                   }`}
                 >
                   <small className="text-[10px] text-muted-2">{label}</small>
@@ -282,7 +283,7 @@ export function HeroWindow() {
                   {school.lessons.map((lesson, i) => (
                     <li
                       key={lesson.title}
-                      className={`flex items-center gap-3 px-4 py-2.5 ${i === 2 ? "max-[680px]:hidden" : ""}`}
+                      className={`flex items-center gap-3 px-4 py-2.5 ${i === 2 ? "max-sm:hidden" : ""}`}
                     >
                       <span className="grid size-8 shrink-0 place-items-center rounded-[9px] bg-[#f0f0f3] text-[9px] font-semibold text-ink">
                         PDF
@@ -293,9 +294,9 @@ export function HeroWindow() {
                         {lesson.status === "analyzing" && (
                           <span className="mt-1.5 block h-1 w-full max-w-[160px] overflow-hidden rounded-pill bg-[#ececf0]">
                             <motion.span
-                              className="block h-full rounded-pill bg-ink"
-                              initial={{ width: 0 }}
-                              animate={{ width: `${"progress" in lesson ? lesson.progress : 0}%` }}
+                              className="block h-full origin-left rounded-pill bg-ink"
+                              initial={{ scaleX: 0 }}
+                              animate={{ scaleX: ("progress" in lesson ? lesson.progress : 0) / 100 }}
                               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
                             />
                           </span>
@@ -313,7 +314,7 @@ export function HeroWindow() {
             </div>
 
             {/* AI insight */}
-            <div className="absolute right-6 bottom-6 w-[280px] rounded-[16px] border border-black/[0.08] bg-white/95 p-4 shadow-[0_18px_44px_rgba(0,0,0,.12)] backdrop-blur-md max-[680px]:right-4 max-[680px]:left-4 max-[680px]:w-auto">
+            <div className="absolute right-6 bottom-6 w-[280px] rounded-[16px] border border-black/[0.08] bg-white/95 p-4 shadow-[0_18px_44px_rgba(0,0,0,.12)] backdrop-blur-md max-sm:right-4 max-sm:left-4 max-sm:w-auto">
               <div className="flex items-center gap-1.5 text-[10px] font-medium text-ink">
                 <i className="size-1.5 rounded-full bg-ink" />
                 EduSphere AI Insight

@@ -45,9 +45,9 @@ const steps: StackItem[] = [
 
 export function LessonFlow() {
   return (
-    <Section theme="light" tone="white" id="platform" className="py-[150px] max-[680px]:py-[105px]">
+    <Section theme="light" tone="white" id="platform" className="py-[150px] max-sm:py-[105px]">
       <Container className="max-w-[1180px]">
-        <div className="mb-16 text-center max-[680px]:mb-10">
+        <div className="mb-16 text-center max-sm:mb-10">
           <Reveal>
             <Eyebrow>Start with the teacher</Eyebrow>
           </Reveal>

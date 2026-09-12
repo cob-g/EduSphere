@@ -17,7 +17,7 @@ export default function SparklesTitle({ children, className = "" }: SparklesTitl
     <div className={`relative w-full overflow-hidden ${className}`}>
       <div className="relative z-10">{children}</div>
 
-      <div className="relative h-80 w-full max-[680px]:h-52">
+      <div className="relative h-80 w-full max-sm:h-52">
         {/* Wide glow bloom */}
         <div className="absolute inset-x-0 top-0 mx-auto h-8 w-3/4 -translate-y-1/2 rounded-full bg-white/25 blur-2xl" />
         <div className="absolute inset-x-0 top-0 mx-auto h-[3px] w-3/4 bg-linear-to-r from-transparent via-neutral-400 to-transparent blur-sm" />

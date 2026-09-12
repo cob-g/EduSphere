@@ -8,23 +8,21 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { navActions, navLinks } from "@/lib/constants/nav";
 
-// Vertical centre of the 64px bar. Whichever `section[data-theme]` spans this
-// line decides the nav's light/dark mode.
+// Sample line, a little below the centre of the 64px bar. Whichever
+// `section[data-theme]` spans it decides the nav's light/dark mode.
 const PROBE_Y = 42;
 const SCROLLED_AT = 8;
 
 // Globe mark only (public/brand/edusphere-mark-*.png). Intrinsic ratio is
 // passed to next/image; the rendered size is set in CSS.
 const MARK = { width: 952, height: 777 } as const;
-const MARK_HEIGHT = 26;
 
 // Backdrop that appears once the page scrolls: page ground fading to
 // transparent, with the blur masked out over the same run so there is no edge.
 const backdropFade = {
-  light: "linear-gradient(180deg, rgba(245,245,247,.92), rgba(245,245,247,.6) 60%, transparent)",
-  dark: "linear-gradient(180deg, rgba(0,0,0,.92), rgba(0,0,0,.6) 60%, transparent)",
+  light: "bg-[linear-gradient(180deg,rgba(245,245,247,.92),rgba(245,245,247,.6)_60%,transparent)]",
+  dark: "bg-[linear-gradient(180deg,rgba(0,0,0,.92),rgba(0,0,0,.6)_60%,transparent)]",
 } as const;
-const backdropMask = "linear-gradient(#000 60%, transparent)";
 
 const textLink =
   "text-[13px] font-medium tracking-[-0.01em] opacity-65 transition-opacity duration-200 ease-apple " +
@@ -84,15 +82,7 @@ export function SiteNav() {
       {/* Scrolled backdrop. Taller than the bar so the fade tails off below it. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-24 transition-opacity duration-300 ease-apple"
-        style={{
-          opacity: scrolled ? 1 : 0,
-          backgroundImage: backdropFade[theme],
-          backdropFilter: "blur(14px)",
-          WebkitBackdropFilter: "blur(14px)",
-          maskImage: backdropMask,
-          WebkitMaskImage: backdropMask,
-        }}
+        className={`pointer-events-none absolute inset-x-0 top-0 h-24 backdrop-blur-[14px] transition-opacity duration-300 ease-apple mask-b-from-60% ${backdropFade[theme]} ${scrolled ? "opacity-100" : "opacity-0"}`}
       />
 
       <Container as="nav" aria-label="Primary" className="relative z-10 flex h-16 items-center justify-between">
@@ -102,17 +92,16 @@ export function SiteNav() {
           className="inline-flex items-center gap-2.5 whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current"
         >
           {/* Both marks are rendered and cross-faded so the theme swap never
-              waits on an image request. */}
-          <span className="relative block shrink-0" style={{ height: MARK_HEIGHT }}>
+              waits on an image request. Not marked eager: that would preload
+              both, and the hidden one would be a wasted request. */}
+          <span className="relative block h-[26px] shrink-0">
             <Image
               src="/brand/edusphere-mark-black.png"
               alt=""
               width={MARK.width}
               height={MARK.height}
               sizes="32px"
-              loading="eager"
-              className="transition-opacity duration-300 ease-apple"
-              style={{ height: MARK_HEIGHT, width: "auto", opacity: dark ? 0 : 1 }}
+              className={`h-[26px] w-auto transition-opacity duration-300 ease-apple ${dark ? "opacity-0" : "opacity-100"}`}
             />
             <Image
               src="/brand/edusphere-mark-white.png"
@@ -120,9 +109,7 @@ export function SiteNav() {
               width={MARK.width}
               height={MARK.height}
               sizes="32px"
-              loading="eager"
-              className="absolute inset-0 transition-opacity duration-300 ease-apple"
-              style={{ height: MARK_HEIGHT, width: "auto", opacity: dark ? 1 : 0 }}
+              className={`absolute inset-0 h-[26px] w-auto transition-opacity duration-300 ease-apple ${dark ? "opacity-100" : "opacity-0"}`}
             />
           </span>
           <span className="text-[15px] font-semibold tracking-[-0.02em]">EduSphere</span>
@@ -132,7 +119,7 @@ export function SiteNav() {
         </Link>
 
         {/* Absolutely centred so it stays centred regardless of the side widths. */}
-        <ul className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-7 min-[1000px]:flex">
+        <ul className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-7 lg:flex">
           {navLinks.map((link) => (
             <li key={link.href}>
               <Link href={link.href} className={textLink}>
@@ -142,12 +129,12 @@ export function SiteNav() {
           ))}
         </ul>
 
-        <div className="flex items-center gap-3 min-[1000px]:gap-5">
+        <div className="flex items-center gap-3 lg:gap-5">
           <Link href={navActions.signIn.href} className={textLink}>
             {navActions.signIn.label}
           </Link>
           {/* On phones the demo action lives in the MobileDock. */}
-          <span className="hidden min-[1000px]:inline-flex">
+          <span className="hidden lg:inline-flex">
             <Button href={navActions.demo.href} variant="ghost" size="sm">
               {navActions.demo.label}
             </Button>

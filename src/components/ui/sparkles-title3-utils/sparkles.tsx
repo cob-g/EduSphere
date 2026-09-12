@@ -50,6 +50,7 @@ export function Sparkles({
     let frame = 0;
     let visible = true;
     let t = 0;
+    let last = 0;
     const pointer = { x: -1e4, y: -1e4 };
 
     const seed = () => {
@@ -78,17 +79,21 @@ export function Sparkles({
       ctx.globalAlpha = 1;
     };
 
-    const tick = () => {
-      t += 0.03;
+    // Time-based so 120Hz displays do not run twice as fast (dt is in 60fps
+    // frames, capped so a resumed tab does not jump).
+    const tick = (now: number) => {
+      const dt = last ? Math.min((now - last) / (1000 / 60), 2) : 1;
+      last = now;
+      t += 0.03 * dt;
       for (const p of particles) {
-        p.x += p.vx;
-        p.y += p.vy;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
         if (mousemove) {
           const dx = pointer.x - p.x;
           const dy = pointer.y - p.y;
           const d2 = dx * dx + dy * dy;
           if (d2 < 140 * 140) {
-            const f = (1 - Math.sqrt(d2) / 140) * 0.02;
+            const f = (1 - Math.sqrt(d2) / 140) * 0.02 * dt;
             p.x += dx * f;
             p.y += dy * f;
           }
@@ -107,19 +112,31 @@ export function Sparkles({
     const start = () => {
       cancelAnimationFrame(frame);
       if (reduceMotion || !visible || document.hidden) return;
+      last = 0;
       frame = requestAnimationFrame(tick);
     };
     const stop = () => cancelAnimationFrame(frame);
 
+    // Keep existing particles across resizes (rescaled) so a scrollbar or
+    // window change does not teleport the whole field.
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const prevW = width;
+      const prevH = height;
       width = rect.width;
       height = rect.height;
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      seed();
+      if (particles.length === 0 || !prevW || !prevH) {
+        seed();
+      } else {
+        for (const p of particles) {
+          p.x *= width / prevW;
+          p.y *= height / prevH;
+        }
+      }
       draw();
     };
 
@@ -146,9 +163,11 @@ export function Sparkles({
     io.observe(canvas);
     const onVisibility = () => (document.hidden ? stop() : start());
     document.addEventListener("visibilitychange", onVisibility);
+    // pointerleave does not bubble, so listen on the root element itself.
+    const root = document.documentElement;
     if (mousemove) {
       window.addEventListener("pointermove", onMove, { passive: true });
-      window.addEventListener("pointerleave", onLeave);
+      root.addEventListener("pointerleave", onLeave);
     }
 
     return () => {
@@ -157,7 +176,7 @@ export function Sparkles({
       io.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerleave", onLeave);
+      root.removeEventListener("pointerleave", onLeave);
     };
   }, [density, mousemove, color, size, speed]);
 

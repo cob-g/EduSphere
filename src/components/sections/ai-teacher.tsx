@@ -10,9 +10,9 @@ import { TeacherDevice } from "./teacher-device";
 // light with sparkles falling away beneath it, into the stage.
 export function AiTeacher() {
   return (
-    <Section theme="dark" tone="night" id="teacher" className="pt-[150px] pb-0 max-[680px]:pt-[105px]">
+    <Section theme="dark" tone="night" id="teacher" className="pt-[150px] pb-0 max-sm:pt-[105px]">
       <SparklesTitle>
-        <Container className="max-w-[1000px] pb-16 text-center max-[680px]:pb-10">
+        <Container className="max-w-[1000px] pb-16 text-center max-sm:pb-10">
           <Reveal>
             <Eyebrow>EduSphere AI Virtual Teacher</Eyebrow>
           </Reveal>
@@ -35,7 +35,7 @@ export function AiTeacher() {
 
       {/* Cinematic stage */}
       <div
-        className="relative -mt-24 grid min-h-[940px] place-items-center max-[680px]:-mt-16 max-[680px]:min-h-[760px]"
+        className="relative -mt-24 grid min-h-[940px] place-items-center max-sm:-mt-16 max-sm:min-h-[760px]"
         style={{
           background:
             "radial-gradient(circle at 50% 28%,rgba(255,255,255,.14),transparent 24%)," +

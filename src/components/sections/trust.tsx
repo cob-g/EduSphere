@@ -63,10 +63,9 @@ export function Trust() {
       tone="paper"
       id="security"
       className="py-[105px] md:py-[150px]"
-      style={{ overflow: "visible" }}
     >
       <Container>
-        <div className="mb-16 grid grid-cols-1 gap-8 min-[1001px]:mb-20 min-[1001px]:grid-cols-[1.15fr_.85fr] min-[1001px]:items-end">
+        <div className="mb-16 grid grid-cols-1 gap-8 lg:mb-20 lg:grid-cols-[1.15fr_.85fr] lg:items-end">
           <div>
             <Reveal>
               <Eyebrow>Trust by design</Eyebrow>
@@ -80,29 +79,31 @@ export function Trust() {
             </Reveal>
           </div>
           <Reveal delay={0.1}>
-            <p className="text-lead max-w-[440px] text-muted min-[1001px]:ml-auto">
+            <p className="text-lead max-w-[440px] text-muted lg:ml-auto">
               Access control, audit history, data boundaries and teacher review are part of
               the foundation, not features added later.
             </p>
           </Reveal>
         </div>
 
-        <ol className="grid gap-5 min-[1001px]:gap-0">
+        <ol className="grid gap-5 lg:gap-0">
           {cards.map((card, i) => {
             const flip = i % 2 === 1;
             return (
               <li
                 key={card.eyebrow}
-                className="min-[1001px]:sticky min-[1001px]:top-[112px] min-[1001px]:pb-6"
+                className="lg:sticky lg:top-[112px] lg:pb-6"
               >
                 <article
                   className={[
                     "grid overflow-hidden rounded-[22px] border border-line bg-white",
-                    "min-[1001px]:min-h-[600px] min-[1001px]:grid-cols-2",
-                    flip ? "min-[1001px]:[&>*:first-child]:order-2" : "",
+                    // Never taller than the space under the pinned offset, so the
+                    // card's footer is always on screen on short laptops.
+                    "lg:min-h-[min(600px,calc(100dvh-136px))] lg:grid-cols-2",
+                    flip ? "lg:[&>*:first-child]:order-2" : "",
                   ].join(" ")}
                 >
-                  <div className="flex flex-col p-8 md:p-12 min-[1001px]:p-14">
+                  <div className="flex flex-col p-8 md:p-12 lg:p-14">
                     <Eyebrow className="flex items-center gap-2.5">
                       <span aria-hidden className="size-1.5 rounded-full bg-ink" />
                       {card.eyebrow}
@@ -120,11 +121,7 @@ export function Trust() {
                   </div>
 
                   <div
-                    className="grid place-items-center bg-night p-8 max-[680px]:min-h-[420px] md:p-12 min-[1001px]:p-14"
-                    style={{
-                      backgroundImage:
-                        "radial-gradient(circle at 50% 110%, rgba(255,255,255,.14), transparent 60%)",
-                    }}
+                    className="grid place-items-center bg-night bg-[radial-gradient(circle_at_50%_110%,rgba(255,255,255,.14),transparent_60%)] p-8 max-sm:min-h-[420px] md:p-12 lg:p-14"
                   >
                     {card.visual}
                   </div>

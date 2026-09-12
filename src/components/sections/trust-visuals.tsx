@@ -17,7 +17,7 @@ export function AccessVisual() {
   return (
     <Mock>
       <MockHeader title="Permissions" meta="San Isidro Academy" />
-      <div className="grid grid-cols-[92px_repeat(4,1fr)] text-[11px] text-white/55 max-[680px]:grid-cols-[68px_repeat(4,1fr)] max-[680px]:text-[10px]">
+      <div className="grid grid-cols-[92px_repeat(4,1fr)] text-[11px] text-white/55 max-sm:grid-cols-[68px_repeat(4,1fr)] max-sm:text-[10px]">
         <span />
         {AREAS.map((a) => (
           <span key={a} className="pb-3 text-center">
@@ -72,7 +72,7 @@ export function AuditVisual() {
         {EVENTS.map((e, i) => (
           <li key={e.what} className="relative pb-6 pl-6 last:pb-0">
             <span
-              className={`absolute top-1.5 -left-[5px] size-[9px] rounded-full ${i === 0 ? "bg-white" : "border border-white/40 bg-[#141416]"}`}
+              className={`absolute top-1.5 -left-[5px] size-[9px] rounded-full ${i === 0 ? "bg-white" : "border border-white/40 bg-night-3"}`}
             />
             <div className="flex items-baseline justify-between gap-4">
               <span className={`text-[13px] ${i === 0 ? "text-white" : "text-white/80"}`}>
@@ -169,7 +169,7 @@ export function ReviewVisual() {
 
 function Mock({ children }: { children: React.ReactNode }) {
   return (
-    <div className="w-full max-w-[420px] rounded-[16px] border border-white/10 bg-[#141416] p-5 text-white shadow-[0_30px_60px_-30px_rgba(0,0,0,.8)]">
+    <div className="w-full max-w-[420px] rounded-[16px] border border-white/10 bg-night-3 p-5 text-white shadow-[0_30px_60px_-30px_rgba(0,0,0,.8)]">
       {children}
     </div>
   );

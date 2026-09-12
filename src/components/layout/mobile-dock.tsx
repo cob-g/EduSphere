@@ -3,7 +3,7 @@
 import { CalendarCheck, Layers, LayoutGrid, ShieldCheck, Sparkles, type LucideIcon } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useState } from "react";
 
 import { navActions, navLinks } from "@/lib/constants/nav";
 
@@ -22,10 +22,7 @@ const DOCK_INSET = 44;
 
 const spring = { type: "spring", stiffness: 420, damping: 34, mass: 0.8 } as const;
 
-// Tapping a tab scrolls the page; the tab itself should not stay focused (the
-// browser would draw its default ring around it). Keyboard users still get the
-// inset ring below through focus-visible.
-const blurOnClick = (e: MouseEvent<HTMLAnchorElement>) => e.currentTarget.blur();
+// No default outline on tap; keyboard users get an inset ring via focus-visible.
 const focusRing =
   "outline-none focus-visible:ring-2 focus-visible:ring-current/40 focus-visible:ring-inset";
 
@@ -39,6 +36,9 @@ export function MobileDock() {
   const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
+    // The dock is display:none from the lg breakpoint up; skip the work there.
+    const desktop = window.matchMedia("(min-width: 62.5rem)");
+
     let frame = 0;
 
     const sectionAt = (y: number) => {
@@ -52,6 +52,7 @@ export function MobileDock() {
 
     const measure = () => {
       frame = 0;
+      if (desktop.matches) return;
       const h = window.innerHeight;
       const current = sectionAt(h * ACTIVE_RATIO);
       setActive(current?.id ? `#${current.id}` : null);
@@ -96,8 +97,9 @@ export function MobileDock() {
       initial={false}
       animate={{ y: hidden ? 140 : 0, opacity: hidden ? 0 : 1 }}
       transition={spring}
-      className="fixed inset-x-0 z-50 flex justify-center px-4 min-[1000px]:hidden"
-      style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 14px)" }}
+      inert={hidden || undefined}
+      aria-hidden={hidden || undefined}
+      className={`fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+14px)] z-50 flex justify-center px-4 lg:hidden ${hidden ? "pointer-events-none" : ""}`}
     >
       <div
         className={`flex w-full max-w-[420px] items-stretch gap-1 rounded-[26px] border p-1.5 backdrop-blur-2xl backdrop-saturate-150 transition-colors duration-300 ease-apple ${shell}`}
@@ -117,7 +119,6 @@ export function MobileDock() {
               <Link
                 href={link.href}
                 aria-current={isActive ? "location" : undefined}
-                onClick={blurOnClick}
                 className={`${focusRing} relative z-10 flex h-[54px] flex-col items-center justify-center gap-1 rounded-[20px] text-[10px] font-medium tracking-[0.01em] whitespace-nowrap transition-colors duration-300 ease-apple ${isActive ? activeText : idleText}`}
               >
                 <Icon aria-hidden className="size-[19px]" strokeWidth={isActive ? 2.25 : 1.75} />
@@ -130,7 +131,6 @@ export function MobileDock() {
         <motion.div whileTap={{ scale: 0.92 }} className="flex-1">
           <Link
             href={navActions.demo.href}
-            onClick={blurOnClick}
             className={`${focusRing} flex h-[54px] flex-col items-center justify-center gap-1 rounded-[20px] text-[10px] font-medium tracking-[0.01em] whitespace-nowrap transition-colors duration-300 ease-apple ${cta}`}
           >
             <CalendarCheck aria-hidden className="size-[19px]" strokeWidth={1.75} />

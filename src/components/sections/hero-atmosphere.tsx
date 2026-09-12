@@ -205,11 +205,7 @@ export function HeroAtmosphere() {
       {/* Floor: valley haze the device stands in */}
       <div
         data-hero="floor"
-        className="absolute inset-x-0 bottom-0 h-[24%]"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(236,237,241,0) 0%, #e9eaee 35%, #e0e1e7 100%)",
-        }}
+        className="absolute inset-x-0 bottom-0 h-[24%] bg-[linear-gradient(180deg,rgba(236,237,241,0)_0%,#e9eaee_35%,#e0e1e7_100%)]"
       />
 
       {/* Film grain */}
@@ -231,7 +227,7 @@ export function HeroForeground() {
         data-hero={ridge.key}
         viewBox={ridge.viewBox}
         preserveAspectRatio="none"
-        className="absolute -inset-x-[3%] top-[70%] w-[106%] max-[680px]:top-[80%]"
+        className="absolute -inset-x-[3%] top-[70%] w-[106%] max-sm:top-[80%]"
         style={{ height: ridge.height }}
       >
         <defs>
@@ -268,7 +264,7 @@ export function HeroForeground() {
 
       <div
         data-hero={fog.key}
-        className="absolute -inset-x-[10%] top-[81%] max-[680px]:top-[86%]"
+        className="absolute -inset-x-[10%] top-[81%] max-sm:top-[86%]"
         style={{
           height: fog.height,
           filter: `blur(${fog.blur}px)`,
@@ -298,6 +294,7 @@ export function HeroForeground() {
 type Node = { x: number; y: number; vx: number; vy: number; r: number };
 
 const LINK_DISTANCE = 130;
+const LINK_DISTANCE_SQ = LINK_DISTANCE * LINK_DISTANCE;
 
 function Constellation() {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -313,6 +310,7 @@ function Constellation() {
     let nodes: Node[] = [];
     let frame = 0;
     let visible = true;
+    let last = 0;
 
     const seed = () => {
       const count = Math.round(Math.min(80, (width * height) / 14000));
@@ -332,8 +330,11 @@ function Constellation() {
         const a = nodes[i];
         for (let j = i + 1; j < nodes.length; j++) {
           const b = nodes[j];
-          const d = Math.hypot(a.x - b.x, a.y - b.y);
-          if (d >= LINK_DISTANCE) continue;
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          const d2 = dx * dx + dy * dy;
+          if (d2 >= LINK_DISTANCE_SQ) continue;
+          const d = Math.sqrt(d2);
           ctx.strokeStyle = `rgba(9,9,11,${(1 - d / LINK_DISTANCE) * 0.16})`;
           ctx.beginPath();
           ctx.moveTo(a.x, a.y);
@@ -349,10 +350,13 @@ function Constellation() {
       }
     };
 
-    const tick = () => {
+    // Time-based so 120Hz displays do not drift twice as fast.
+    const tick = (now: number) => {
+      const dt = last ? Math.min((now - last) / (1000 / 60), 2) : 1;
+      last = now;
       for (const n of nodes) {
-        n.x += n.vx;
-        n.y += n.vy;
+        n.x += n.vx * dt;
+        n.y += n.vy * dt;
         if (n.x < -12) n.x = width + 12;
         else if (n.x > width + 12) n.x = -12;
         if (n.y < -12) n.y = height + 12;
@@ -365,19 +369,31 @@ function Constellation() {
     const start = () => {
       cancelAnimationFrame(frame);
       if (reduceMotion || !visible || document.hidden) return;
+      last = 0;
       frame = requestAnimationFrame(tick);
     };
     const stop = () => cancelAnimationFrame(frame);
 
+    // Rescale existing nodes on resize instead of reseeding, so the field
+    // does not jump when the window or scrollbar changes.
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const prevW = width;
+      const prevH = height;
       width = rect.width;
       height = rect.height;
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      seed();
+      if (nodes.length === 0 || !prevW || !prevH) {
+        seed();
+      } else {
+        for (const n of nodes) {
+          n.x *= width / prevW;
+          n.y *= height / prevH;
+        }
+      }
       draw();
     };
 
@@ -403,13 +419,11 @@ function Constellation() {
     };
   }, []);
 
-  const mask = "radial-gradient(75% 90% at 50% 20%, #000 25%, transparent 100%)";
   return (
     <canvas
       ref={ref}
       data-hero="stars"
-      className="absolute inset-x-0 top-0 h-[50%] w-full"
-      style={{ maskImage: mask, WebkitMaskImage: mask }}
+      className="absolute inset-x-0 top-0 h-[50%] w-full mask-[radial-gradient(75%_90%_at_50%_20%,#000_25%,transparent_100%)]"
     />
   );
 }

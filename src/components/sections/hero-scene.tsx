@@ -43,7 +43,7 @@ export function HeroScene() {
 
         // Idle drift for the clouds (time-driven, on x — never fights the
         // scroll-driven y above because GSAP composes transforms per axis).
-        gsap.utils.toArray<HTMLElement>('[data-hero^="cloud"]').forEach((bank) => {
+        gsap.utils.toArray<HTMLElement>('[data-hero^="cloud"]', root).forEach((bank) => {
           gsap.to(bank, {
             x: Number(bank.dataset.drift ?? 30),
             duration: Number(bank.dataset.period ?? 24),
@@ -82,7 +82,7 @@ export function HeroScene() {
     <div ref={scope} className="relative">
       <HeroAtmosphere />
 
-      <div className="relative pt-[150px] pb-[170px] max-[680px]:pt-[112px] max-[680px]:pb-[120px]">
+      <div className="relative pt-[150px] pb-[170px] max-sm:pt-[112px] max-sm:pb-[120px]">
         <Container as="header" className="max-w-[1040px] text-center">
           <HeroCopy />
         </Container>

@@ -54,7 +54,7 @@ export function MissionStatement() {
   return (
     <p
       ref={ref}
-      className="max-w-[1080px] text-[clamp(56px,8vw,112px)] leading-[0.95] font-semibold tracking-[-0.06em] max-[680px]:text-[14vw]"
+      className="max-w-[1080px] text-[clamp(56px,8vw,112px)] leading-[0.95] font-semibold tracking-[-0.06em] max-sm:text-[14vw]"
     >
       <Words text={LINE_1} to="#ffffff" />
       <Words text={LINE_2} to="#727278" />

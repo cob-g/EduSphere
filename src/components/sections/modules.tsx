@@ -86,18 +86,18 @@ export function Modules() {
           </Reveal>
         </div>
 
-        <div className="mt-[70px] grid grid-cols-1 gap-3.5 min-[1001px]:grid-cols-[1.15fr_.85fr]">
+        <div className="mt-[70px] grid grid-cols-1 gap-3.5 lg:grid-cols-[1.15fr_.85fr]">
           {modules.map((m, i) => {
             const large = i === 0;
             return (
               <Reveal
                 key={m.eyebrow}
                 delay={i * 0.08}
-                className={large ? "min-[1001px]:row-span-2" : ""}
+                className={large ? "lg:row-span-2" : ""}
               >
                 <ModuleCard
                   className={
-                    large ? "min-h-[420px] min-[1001px]:min-h-[654px]" : "min-h-[320px]"
+                    large ? "min-h-[420px] lg:min-h-[654px]" : "min-h-[320px]"
                   }
                 >
                   <Eyebrow>{m.eyebrow}</Eyebrow>

@@ -19,6 +19,8 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 export const MOTION_QUERIES = {
   motionOK: "(prefers-reduced-motion: no-preference)",
   reduceMotion: "(prefers-reduced-motion: reduce)",
+  /** Mouse/trackpad, not touch: hover-driven effects only make sense here. */
+  finePointer: "(hover: hover) and (pointer: fine)",
 } as const;
 
 export { gsap, ScrollTrigger, useGSAP };
