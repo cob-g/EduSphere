@@ -1,8 +1,7 @@
 "use client";
 
-import { ArrowUp, Mail } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import {
   useEffect,
   useRef,
@@ -11,11 +10,6 @@ import {
   type PointerEvent,
 } from "react";
 
-import {
-  FacebookIcon,
-  LinkedinIcon,
-  TelegramIcon,
-} from "@/components/ui/brand-icons";
 import { Button } from "@/components/ui/button";
 import { Magnetic } from "@/components/ui/magnetic";
 
@@ -27,7 +21,7 @@ import {
   ScrollTrigger,
   useGSAP,
 } from "@/lib/animations/gsap";
-import { contactEmail, navLinks, socialLinks } from "@/lib/constants/nav";
+import { contactEmail, socialLinks } from "@/lib/constants/nav";
 
 const MARQUEE = [
   "AI Virtual Teacher",
@@ -40,20 +34,12 @@ const MARQUEE = [
   "Audit trail",
 ];
 
-const SOCIAL_ICONS = {
-  LinkedIn: LinkedinIcon,
-  Facebook: FacebookIcon,
-  Telegram: TelegramIcon,
-} as const;
-
-// Glass pills sit on a near-black ground, so no backdrop blur is needed (and
-// backdrop-filter inside a clipped fixed subtree is unreliable in WebKit).
+// Glass surface for the scroll-to-top button. No backdrop blur: backdrop-filter
+// inside a clipped fixed subtree is unreliable in WebKit.
 const glass =
   "border border-white/10 bg-white/[0.04] shadow-[inset_0_1px_1px_rgba(255,255,255,.08)] " +
   "transition-[background-color,border-color,color] duration-300 ease-apple " +
   "hover:border-white/25 hover:bg-white/[0.09] hover:text-white";
-const pill = `inline-flex items-center rounded-pill px-5 py-2.5 text-[13px] font-medium text-white/70 ${glass}`;
-const iconButton = `grid size-11 place-items-center rounded-full text-white/75 ${glass}`;
 
 function MarqueeRun() {
   return (
@@ -75,8 +61,8 @@ function MarqueeRun() {
 // so the last section scrolls away and reveals it underneath like a curtain
 // lifting. Anywhere it would not fit (phones, short windows) it simply flows,
 // so nothing can be cut off. Inside: a diagonal marquee of what the platform
-// covers, the closing statement with the demo buttons, the section links, and
-// the wordmark rising from the bottom edge. Entrances are scroll-scrubbed;
+// covers, the closing statement with the demo buttons and the email, and the
+// wordmark rising from the bottom edge. Entrances are scroll-scrubbed;
 // reduced-motion users get the final state.
 export function SiteFooter() {
   const wrap = useRef<HTMLElement>(null);
@@ -216,11 +202,11 @@ export function SiteFooter() {
         {/* Wordmark rising from the bottom edge */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-[calc(clamp(96px,26vw,380px)*0.62)] left-1/2 -translate-x-1/2 select-none max-sm:-bottom-[calc(96px*0.35)]"
+          className="pointer-events-none absolute -bottom-[3vh] left-1/2 -translate-x-1/2 select-none"
         >
           <div
             ref={giant}
-            className="relative text-[clamp(96px,26vw,380px)] leading-none font-semibold tracking-[-0.07em] whitespace-nowrap text-white/[0.04] mask-[linear-gradient(180deg,#000_30%,rgba(0,0,0,.15)_70%)] [-webkit-text-stroke:1.5px_rgba(255,255,255,.18)]"
+            className="relative text-[clamp(96px,21vw,320px)] leading-none font-semibold tracking-[-0.07em] whitespace-nowrap text-white/[0.04] mask-[linear-gradient(180deg,#000_20%,rgba(0,0,0,.1)_90%)] [-webkit-text-stroke:1.5px_rgba(255,255,255,.16)]"
             style={{ "--sx": "-999px", "--sy": "-999px" } as CSSProperties}
           >
             EDUSPHERE
@@ -246,7 +232,7 @@ export function SiteFooter() {
         </div>
 
         {/* Closing statement */}
-        <div className="relative z-10 mx-auto flex w-full max-w-[980px] flex-1 flex-col items-center justify-center px-[22px] pt-[150px] pb-6 text-center max-sm:pt-[96px]">
+        <div className="relative z-10 mx-auto flex w-full max-w-[980px] flex-1 flex-col items-center justify-center px-[22px] pt-[150px] pb-8 text-center max-sm:pt-[96px] lg:pb-[16vh]">
           <div ref={head}>
             <p className="mb-5 text-[13px] font-medium tracking-[0.01em] text-muted-dark">
               One Platform. Complete School Intelligence.
@@ -276,64 +262,6 @@ export function SiteFooter() {
               </Magnetic>
             </div>
             <FooterEmail email={contactEmail} />
-
-            <div className="flex flex-col items-center gap-5 md:flex-row md:gap-4">
-              <nav
-                aria-label="Footer"
-                className="flex flex-wrap justify-center gap-2.5"
-              >
-                {navLinks.map((link) => (
-                  <Magnetic key={link.href} strength={0.2}>
-                    <Link href={link.href} className={pill}>
-                      {link.label}
-                    </Link>
-                  </Magnetic>
-                ))}
-                <Magnetic strength={0.2}>
-                  <a href={mailto} className={pill}>
-                    Contact
-                  </a>
-                </Magnetic>
-              </nav>
-
-              <span
-                aria-hidden
-                className="hidden h-6 w-px bg-white/15 md:block"
-              />
-
-              {/* Where to find us */}
-              <ul className="flex items-center gap-2.5" aria-label="Social">
-                {socialLinks.map((s) => {
-                  const Icon = SOCIAL_ICONS[s.label];
-                  return (
-                    <li key={s.label}>
-                      <Magnetic strength={0.25}>
-                        <a
-                          href={s.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={s.label}
-                          className={iconButton}
-                        >
-                          <Icon className="size-[17px]" />
-                        </a>
-                      </Magnetic>
-                    </li>
-                  );
-                })}
-                <li>
-                  <Magnetic strength={0.25}>
-                    <a href={mailto} aria-label="Email" className={iconButton}>
-                      <Mail
-                        aria-hidden
-                        className="size-[18px]"
-                        strokeWidth={1.75}
-                      />
-                    </a>
-                  </Magnetic>
-                </li>
-              </ul>
-            </div>
           </div>
         </div>
 
@@ -341,6 +269,17 @@ export function SiteFooter() {
         <div className="relative z-20 flex w-full flex-col items-center justify-between gap-5 px-[22px] pb-[calc(env(safe-area-inset-bottom,0px)+28px)] md:flex-row md:px-12">
           <p className="order-2 text-[10px] font-medium tracking-[0.18em] text-muted-dark-2 uppercase md:order-1 md:text-[11px]">
             © 2026 EduSphere AI. All rights reserved.
+            {socialLinks.map((social) => (
+              <a
+                key={social.href}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-4 text-white/60 transition-colors duration-200 ease-apple hover:text-white"
+              >
+                {social.label}
+              </a>
+            ))}
           </p>
           <div className="order-1 flex items-center gap-2.5 rounded-pill border border-white/10 bg-white/[0.04] py-2 pr-5 pl-2.5 md:order-2">
             <Image
@@ -366,11 +305,6 @@ export function SiteFooter() {
             </button>
           </Magnetic>
         </div>
-        {/* The band the wordmark rises into. Content stops here. */}
-        <div
-          aria-hidden
-          className="h-[calc(clamp(96px,26vw,380px)*0.26)] w-full shrink-0 max-sm:h-[60px]"
-        />
       </footer>
     </Section>
   );
