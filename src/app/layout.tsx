@@ -41,6 +41,10 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     url: "/",
   },
+  // The Open Graph image comes from app/opengraph-image.png via the file
+  // convention. This only asks X and other summary-card readers to show it
+  // large rather than as a thumbnail.
+  twitter: { card: "summary_large_image" },
 };
 
 // Let the page extend under the home indicator so the phone dock can respect
