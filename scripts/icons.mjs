@@ -2,15 +2,15 @@
 // project root: node scripts/icons.mjs (sharp comes with Next).
 import sharp from "sharp";
 import { writeFileSync } from "node:fs";
-const SRC = "public/brand/edusphere-mark-white.png";
+const SRC = "public/brand/edusphere-mark-black.png";
 const mark = await sharp(SRC).trim().toBuffer();
 
-// Black tile with the white mark. `scale` = mark width as a share of the
+// White tile with the black mark. `scale` = mark width as a share of the
 // tile; small tab icons get a bigger mark so it survives downsampling.
 async function tile(size, scale, radius) {
   const w = Math.round(size * scale);
   const m = await sharp(mark).resize({ width: w, fit: "inside" }).toBuffer({ resolveWithObject: true });
-  const bg = Buffer.from(`<svg width="${size}" height="${size}"><rect width="${size}" height="${size}" rx="${radius}" fill="#000"/></svg>`);
+  const bg = Buffer.from(`<svg width="${size}" height="${size}"><rect width="${size}" height="${size}" rx="${radius}" fill="#fff"/></svg>`);
   return sharp(bg).composite([{ input: m.data, left: Math.round((size - m.info.width) / 2), top: Math.round((size - m.info.height) / 2) }]).png().toBuffer();
 }
 
