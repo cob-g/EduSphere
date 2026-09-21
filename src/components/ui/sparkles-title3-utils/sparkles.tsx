@@ -13,6 +13,14 @@ type SparklesProps = {
   size?: number;
   /** Drift speed multiplier. */
   speed?: number;
+  /**
+   * Elliptical fade painted into the canvas: radii as fractions of the canvas
+   * width and height, centred, opaque at the middle and fully transparent at
+   * `edge` (a fraction of those radii). Equivalent to the CSS mask
+   * `radial-gradient(<rx> <ry>, white, transparent <edge>)`, without the extra
+   * compositor pass a mask on an animating canvas costs on every frame.
+   */
+  fade?: { rx: number; ry: number; edge: number };
   className?: string;
 };
 
@@ -34,8 +42,13 @@ export function Sparkles({
   color = "#ffffff",
   size = 1,
   speed = 1,
+  fade,
   className = "",
 }: SparklesProps) {
+  const fadeRx = fade?.rx;
+  const fadeRy = fade?.ry;
+  const fadeEdge = fade?.edge;
+
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -75,10 +88,29 @@ export function Sparkles({
       }));
     };
 
+    const fading = fadeRx !== undefined && fadeRy !== undefined && fadeEdge !== undefined;
+    // Unit-space gradient, stretched to the ellipse by the transform in draw().
+    const falloff = fading ? ctx.createRadialGradient(0, 0, 0, 0, 0, 1) : null;
+    if (falloff && fadeEdge !== undefined) {
+      falloff.addColorStop(0, "rgba(0,0,0,1)");
+      falloff.addColorStop(Math.min(1, fadeEdge), "rgba(0,0,0,0)");
+    }
+
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
       ctx.fillStyle = color;
+      const cx = width / 2;
+      const cy = height / 2;
+      // Beyond this ellipse the fade is fully transparent, so nothing drawn
+      // there can show. Most of the field lives out there: skip it.
+      const limX = fading ? width * (fadeRx as number) * (fadeEdge as number) : 0;
+      const limY = fading ? height * (fadeRy as number) * (fadeEdge as number) : 0;
       for (const p of particles) {
+        if (fading && limX && limY) {
+          const nx = (Math.abs(p.x - cx) - p.r) / limX;
+          const ny = (Math.abs(p.y - cy) - p.r) / limY;
+          if (nx > 0 && ny > 0 ? nx * nx + ny * ny > 1 : nx > 1 || ny > 1) continue;
+        }
         const twinkle = 0.5 + 0.5 * Math.sin(t * p.rate + p.phase);
         ctx.globalAlpha = 0.15 + 0.85 * twinkle;
         ctx.beginPath();
@@ -86,6 +118,18 @@ export function Sparkles({
         ctx.fill();
       }
       ctx.globalAlpha = 1;
+
+      if (falloff && width && height) {
+        const rx = width * (fadeRx as number);
+        const ry = height * (fadeRy as number);
+        ctx.save();
+        ctx.globalCompositeOperation = "destination-in";
+        ctx.translate(cx, cy);
+        ctx.scale(rx, ry);
+        ctx.fillStyle = falloff;
+        ctx.fillRect(-cx / rx, -cy / ry, width / rx, height / ry);
+        ctx.restore();
+      }
     };
 
     // Time-based so 120Hz displays do not run twice as fast (dt is in 60fps
@@ -194,7 +238,7 @@ export function Sparkles({
       window.removeEventListener("pointermove", onMove);
       root.removeEventListener("pointerleave", onLeave);
     };
-  }, [density, mousemove, color, size, speed]);
+  }, [density, mousemove, color, size, speed, fadeRx, fadeRy, fadeEdge]);
 
   return <canvas ref={ref} aria-hidden className={className} />;
 }

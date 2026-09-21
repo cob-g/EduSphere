@@ -24,11 +24,15 @@ export default function SparklesTitle({ children, className = "" }: SparklesTitl
         <div className="absolute inset-x-0 top-0 mx-auto h-px w-3/4 bg-linear-to-r from-transparent via-neutral-200 to-transparent" />
         <div className="absolute inset-x-0 top-0 mx-auto h-px w-2/5 bg-linear-to-r from-transparent via-white to-transparent" />
 
+        {/* The field fades out in an ellipse. That fade is painted inside the
+            canvas (see `fade`), not applied as a CSS mask, which would cost an
+            extra compositor pass on every animated frame. */}
         <Sparkles
           density={1600}
           size={1.4}
           mousemove
-          className="absolute inset-x-0 top-0 -mt-28 h-full w-full mask-[radial-gradient(55%_55%,white,transparent_60%)]"
+          fade={{ rx: 0.55, ry: 0.55, edge: 0.6 }}
+          className="absolute inset-x-0 top-0 -mt-28 h-full w-full"
         />
       </div>
     </div>

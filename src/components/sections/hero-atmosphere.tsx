@@ -239,27 +239,36 @@ export function HeroAtmosphere() {
         }}
       />
 
-      {/* Clouds */}
+      {/* Clouds. The element that moves (data-hero, animated by HeroScene) and
+          the element that is blurred are deliberately not the same one. A
+          filter on a layer whose transform is animating is re-run by the
+          compositor on every frame, as its own render pass. On a still child
+          of the moving layer, the same blur is rasterised once into that
+          layer's texture and then only slides around. Same pixels, no
+          per-frame cost. The fog banks and the far ridge below do the same. */}
       {CLOUDS.map((layer) => (
         <div
           key={layer.key}
           data-hero={layer.key}
           data-drift={layer.drift}
           data-period={layer.period}
-          className="absolute -inset-x-[12%] [filter:blur(var(--hero-blur))] max-sm:[filter:blur(var(--hero-blur-sm))]"
-          style={{
-            top: layer.top,
-            height: layer.height,
-            "--hero-blur": `${layer.blur}px`,
-            "--hero-blur-sm": `${Math.round(layer.blur * 0.45)}px`,
-            background: layer.spots
-              .map(
-                ([x, y, w, h, a]) =>
-                  `radial-gradient(${w}% ${h}% at ${x}% ${y}%, rgba(255,255,255,${a}), transparent 68%)`,
-              )
-              .join(","),
-          } as CSSProperties}
-        />
+          className="absolute -inset-x-[12%]"
+          style={{ top: layer.top, height: layer.height }}
+        >
+          <div
+            className="absolute inset-0 [filter:blur(var(--hero-blur))] max-sm:[filter:blur(var(--hero-blur-sm))]"
+            style={{
+              "--hero-blur": `${layer.blur}px`,
+              "--hero-blur-sm": `${Math.round(layer.blur * 0.45)}px`,
+              background: layer.spots
+                .map(
+                  ([x, y, w, h, a]) =>
+                    `radial-gradient(${w}% ${h}% at ${x}% ${y}%, rgba(255,255,255,${a}), transparent 68%)`,
+                )
+                .join(","),
+            } as CSSProperties}
+          />
+        </div>
       ))}
 
       <Constellation />
@@ -267,40 +276,44 @@ export function HeroAtmosphere() {
       {/* Mountain ranges with fog between them */}
       {RIDGES.map((ridge, i) => (
         <div key={ridge.key} className="contents">
-          <svg
+          <div
             data-hero={ridge.key}
-            viewBox="0 0 1440 500"
-            preserveAspectRatio="none"
-            className="absolute -inset-x-[3%] w-[106%] max-sm:[filter:none]"
-            style={{
-              top: ridge.top,
-              height: ridge.height,
-              filter: ridge.blur ? `blur(${ridge.blur}px)` : undefined,
-            }}
+            className="absolute -inset-x-[3%] w-[106%]"
+            style={{ top: ridge.top, height: ridge.height }}
           >
-            <defs>
-              <linearGradient id={`${ridge.key}-g`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor={ridge.from} />
-                <stop offset="1" stopColor={ridge.to} />
-              </linearGradient>
-            </defs>
-            <path d={ridge.d} fill={`url(#${ridge.key}-g)`} />
-          </svg>
+            <svg
+              viewBox="0 0 1440 500"
+              preserveAspectRatio="none"
+              className="block size-full max-sm:[filter:none]"
+              style={{ filter: ridge.blur ? `blur(${ridge.blur}px)` : undefined }}
+            >
+              <defs>
+                <linearGradient id={`${ridge.key}-g`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor={ridge.from} />
+                  <stop offset="1" stopColor={ridge.to} />
+                </linearGradient>
+              </defs>
+              <path d={ridge.d} fill={`url(#${ridge.key}-g)`} />
+            </svg>
+          </div>
           {FOG[i] && (
             <div
               data-hero={FOG[i].key}
-              className="absolute -inset-x-[10%] [filter:blur(var(--hero-blur))] max-sm:[filter:blur(var(--hero-blur-sm))]"
-              style={{
-                top: FOG[i].top,
-                height: FOG[i].height,
-                "--hero-blur": `${FOG[i].blur}px`,
-                "--hero-blur-sm": `${Math.round(FOG[i].blur * 0.5)}px`,
-                background:
-                  `radial-gradient(45% 60% at 20% 50%, rgba(255,255,255,${FOG[i].alpha}), transparent 70%),` +
-                  `radial-gradient(50% 60% at 60% 55%, rgba(255,255,255,${FOG[i].alpha}), transparent 70%),` +
-                  `radial-gradient(40% 60% at 95% 45%, rgba(255,255,255,${FOG[i].alpha}), transparent 70%)`,
-              } as CSSProperties}
-            />
+              className="absolute -inset-x-[10%]"
+              style={{ top: FOG[i].top, height: FOG[i].height }}
+            >
+              <div
+                className="absolute inset-0 [filter:blur(var(--hero-blur))] max-sm:[filter:blur(var(--hero-blur-sm))]"
+                style={{
+                  "--hero-blur": `${FOG[i].blur}px`,
+                  "--hero-blur-sm": `${Math.round(FOG[i].blur * 0.5)}px`,
+                  background:
+                    `radial-gradient(45% 60% at 20% 50%, rgba(255,255,255,${FOG[i].alpha}), transparent 70%),` +
+                    `radial-gradient(50% 60% at 60% 55%, rgba(255,255,255,${FOG[i].alpha}), transparent 70%),` +
+                    `radial-gradient(40% 60% at 95% 45%, rgba(255,255,255,${FOG[i].alpha}), transparent 70%)`,
+                } as CSSProperties}
+              />
+            </div>
           )}
         </div>
       ))}
@@ -351,18 +364,22 @@ export function HeroForeground() {
 
       <div
         data-hero={fog.key}
-        className="absolute -inset-x-[10%] top-[81%] [filter:blur(var(--hero-blur))] max-sm:top-[86%] max-sm:[filter:blur(var(--hero-blur-sm))]"
-        style={{
-          height: fog.height,
-          "--hero-blur": `${fog.blur}px`,
-          "--hero-blur-sm": `${Math.round(fog.blur * 0.5)}px`,
-          background:
-            `radial-gradient(40% 60% at 10% 55%, rgba(255,255,255,${fog.alpha}), transparent 70%),` +
-            `radial-gradient(50% 65% at 45% 60%, rgba(255,255,255,${fog.alpha}), transparent 70%),` +
-            `radial-gradient(45% 60% at 80% 50%, rgba(255,255,255,${fog.alpha}), transparent 70%),` +
-            `linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(240,241,245,.6) 55%, rgba(236,237,241,.85) 100%)`,
-        } as CSSProperties}
-      />
+        className="absolute -inset-x-[10%] top-[81%] max-sm:top-[86%]"
+        style={{ height: fog.height }}
+      >
+        <div
+          className="absolute inset-0 [filter:blur(var(--hero-blur))] max-sm:[filter:blur(var(--hero-blur-sm))]"
+          style={{
+            "--hero-blur": `${fog.blur}px`,
+            "--hero-blur-sm": `${Math.round(fog.blur * 0.5)}px`,
+            background:
+              `radial-gradient(40% 60% at 10% 55%, rgba(255,255,255,${fog.alpha}), transparent 70%),` +
+              `radial-gradient(50% 65% at 45% 60%, rgba(255,255,255,${fog.alpha}), transparent 70%),` +
+              `radial-gradient(45% 60% at 80% 50%, rgba(255,255,255,${fog.alpha}), transparent 70%),` +
+              `linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(240,241,245,.6) 55%, rgba(236,237,241,.85) 100%)`,
+          } as CSSProperties}
+        />
+      </div>
 
       {/* Film grain over the foreground too, so it belongs to the same image */}
       <div
@@ -417,6 +434,32 @@ function Constellation() {
       }));
     };
 
+    // The field fades out toward the edges of the sky. This used to be a CSS
+    // mask on the canvas element, which the compositor had to apply as an
+    // extra render pass on every frame the canvas repainted or moved. The
+    // same falloff is now painted into the canvas itself: an ellipse 75% of
+    // the width by 90% of the height, centred at 50% 20%, fully opaque out to
+    // a quarter of its radius and transparent at its edge. The gradient lives
+    // in unit space and is stretched by the transform, so one serves any size.
+    const falloff = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+    falloff.addColorStop(0, "rgba(0,0,0,1)");
+    falloff.addColorStop(0.25, "rgba(0,0,0,1)");
+    falloff.addColorStop(1, "rgba(0,0,0,0)");
+    const fade = () => {
+      const cx = width * 0.5;
+      const cy = height * 0.2;
+      const rx = width * 0.75;
+      const ry = height * 0.9;
+      if (!rx || !ry) return;
+      ctx.save();
+      ctx.globalCompositeOperation = "destination-in";
+      ctx.translate(cx, cy);
+      ctx.scale(rx, ry);
+      ctx.fillStyle = falloff;
+      ctx.fillRect(-cx / rx, -cy / ry, width / rx, height / ry);
+      ctx.restore();
+    };
+
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
       ctx.lineWidth = 1;
@@ -442,6 +485,7 @@ function Constellation() {
         ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
         ctx.fill();
       }
+      fade();
     };
 
     // Time-based so 120Hz displays do not drift twice as fast.
@@ -520,7 +564,7 @@ function Constellation() {
     <canvas
       ref={ref}
       data-hero="stars"
-      className="absolute inset-x-0 top-0 h-[50%] w-full mask-[radial-gradient(75%_90%_at_50%_20%,#000_25%,transparent_100%)]"
+      className="absolute inset-x-0 top-0 h-[50%] w-full"
     />
   );
 }

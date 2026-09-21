@@ -313,8 +313,10 @@ export function HeroWindow() {
               </AnimatePresence>
             </div>
 
-            {/* AI insight */}
-            <div className="absolute right-6 bottom-6 w-[280px] rounded-[16px] border border-black/[0.08] bg-white/95 p-4 shadow-[0_18px_44px_rgba(0,0,0,.12)] backdrop-blur-md max-sm:right-4 max-sm:left-4 max-sm:w-auto">
+            {/* AI insight. No backdrop blur: the card is 95% white over a plain
+                white pane, so a blur had nothing to show and still cost a
+                filter pass inside a 3D-transformed, reflected slab. */}
+            <div className="absolute right-6 bottom-6 w-[280px] rounded-[16px] border border-black/[0.08] bg-white/95 p-4 shadow-[0_18px_44px_rgba(0,0,0,.12)] max-sm:right-4 max-sm:left-4 max-sm:w-auto">
               <div className="flex items-center gap-1.5 text-[10px] font-medium text-ink">
                 <i className="size-1.5 rounded-full bg-ink" />
                 EduSphere AI Insight
