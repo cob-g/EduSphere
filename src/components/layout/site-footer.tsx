@@ -21,6 +21,7 @@ import {
   ScrollTrigger,
   useGSAP,
 } from "@/lib/animations/gsap";
+import { markWhite } from "@/lib/assets/images";
 import { contactEmail, socialLinks } from "@/lib/constants/nav";
 
 const MARQUEE = [
@@ -277,10 +278,8 @@ export function SiteFooter() {
           </p>
           <div className="order-1 flex items-center gap-2.5 rounded-pill border border-white/10 bg-white/[0.04] py-2 pr-5 pl-2.5 md:order-2">
             <Image
-              src="/brand/edusphere-mark-white.png"
+              src={markWhite}
               alt=""
-              width={952}
-              height={777}
               sizes="22px"
               className="h-auto w-[22px]"
             />

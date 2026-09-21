@@ -3,6 +3,7 @@ import StackInteractor, { type StackItem } from "@/components/ui/connoisseur-sta
 import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Section } from "@/components/ui/section";
+import { stepApproves, stepOneRecord, stepUnderstands, stepUpload } from "@/lib/assets/images";
 
 // Band 4: the lesson flow, one section instead of four. Each step has its own
 // illustration (public/product), clipped and reassembled by the stack
@@ -14,7 +15,7 @@ const steps: StackItem[] = [
     name: "Upload lesson",
     description:
       "PDF, PowerPoint, Word, images, video or a lesson plan. EduSphere starts from the teacher's approved material.",
-    image: "/product/step-1-upload.jpg",
+    image: stepUpload,
     layout: "layers",
   },
   {
@@ -22,7 +23,7 @@ const steps: StackItem[] = [
     name: "AI understands",
     description:
       "Objectives, concepts, examples, activities, likely questions and assessment opportunities, identified from the source.",
-    image: "/product/step-2-ai-understands.jpg",
+    image: stepUnderstands,
     layout: "mosaic",
   },
   {
@@ -30,7 +31,7 @@ const steps: StackItem[] = [
     name: "Teacher approves",
     description:
       "Edit the script, change the tone, add examples, approve the quiz. Publish only when it is ready.",
-    image: "/product/step-3-teacher-approves.jpg",
+    image: stepApproves,
     layout: "grid",
   },
   {
@@ -38,7 +39,7 @@ const steps: StackItem[] = [
     name: "One record",
     description:
       "Enrollment, payments, grades, attendance, documents and AI learning data stay on one authorized student context.",
-    image: "/product/step-4-one-record.jpg",
+    image: stepOneRecord,
     layout: "columns",
   },
 ];

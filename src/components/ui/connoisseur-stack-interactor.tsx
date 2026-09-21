@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import { useId, useRef, useState } from "react";
 
 import { gsap, MOTION_QUERIES, useGSAP } from "@/lib/animations/gsap";
@@ -22,8 +22,9 @@ export type StackItem = {
   /** Two words render on two lines, as in the original. */
   name: string;
   description?: string;
-  /** A photograph, served through next/image and lazy-loaded… */
-  image?: string;
+  /** A photograph, served through next/image and lazy-loaded. Prefer a static
+   *  import: the file is fingerprinted and its variants cache as immutable. */
+  image?: StaticImageData | string;
   /** …or any markup, clipped by the same shapes. */
   visual?: React.ReactNode;
   layout: StackLayout;
@@ -207,7 +208,7 @@ export default function StackInteractor({ items, className = "", grayscale = tru
             {items.map((it, i) =>
               it.image ? (
                 <Image
-                  key={it.image}
+                  key={typeof it.image === "string" ? it.image : it.image.src}
                   src={it.image}
                   alt=""
                   fill

@@ -16,6 +16,8 @@ import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/rea
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
+import { markWhite } from "@/lib/assets/images";
+
 // ---------------------------------------------------------------------------
 // The device: a light glass slab standing on the studio floor, with a contact
 // shadow and a floor reflection. Where fora.so shows a community's landing
@@ -159,10 +161,8 @@ export function HeroWindow() {
         >
           <span className="flex items-center gap-2">
             <Image
-              src="/brand/edusphere-mark-white.png"
+              src={markWhite}
               alt=""
-              width={952}
-              height={777}
               sizes="28px"
               className="h-[22px] w-auto"
             />

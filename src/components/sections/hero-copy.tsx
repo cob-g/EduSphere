@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
+import { markBlack } from "@/lib/assets/images";
 
 // Staggered entrance for the hero headline group: the EduSphere mark, the
 // headline, lead and calls to action. Driven by CSS so the server HTML is
@@ -13,11 +14,12 @@ export function HeroCopy() {
     <div data-hero="copy">
       <div className="mb-9 flex justify-center motion-safe:animate-rise-mark">
         <Image
-          src="/brand/edusphere-mark-black.png"
+          src={markBlack}
           alt="EduSphere AI"
-          width={952}
-          height={777}
           sizes="120px"
+          // Above the fold on every screen, so it should not wait for the lazy
+          // loader to decide it is in view.
+          loading="eager"
           className="h-[92px] w-auto max-sm:h-[72px]"
         />
       </div>
