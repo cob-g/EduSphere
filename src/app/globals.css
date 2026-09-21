@@ -9,8 +9,26 @@
  *
  * There is NO accent colour. Emphasis comes from contrast, weight and space.
  */
+/*
+ * Fallback for display headlines while Inter is still loading. Arial at its
+ * natural size sets these headlines within about 1% of Inter's display cut, so
+ * they wrap on the same words and nothing moves when the real font swaps in.
+ * The ascent and descent are Inter's own, which keeps the baseline still too.
+ * Android has no Arial and falls through to Roboto, which already matches.
+ */
+@font-face {
+  font-family: "Inter Display Fallback";
+  src: local("Arial");
+  size-adjust: 100%;
+  ascent-override: 96.88%;
+  descent-override: 24.12%;
+  line-gap-override: 0%;
+}
+
 @theme {
   --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  /* --font-inter-name is Inter's generated family name, set on <html> in layout.tsx. */
+  --font-display: var(--font-inter-name), "Inter Display Fallback", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
   --font-serif: var(--font-instrument-serif), "Times New Roman", Georgia, serif;
 
   /* Monochrome palette */
@@ -54,6 +72,11 @@
   }
   @keyframes rise-mark {
     from { opacity: 0; scale: 0.92; translate: 0 12px; }
+  }
+  /* The hero device: last in the stagger, longer travel. */
+  --animate-rise-window: rise-window 1.2s var(--ease-apple) 0.5s both;
+  @keyframes rise-window {
+    from { opacity: 0; translate: 0 56px; }
   }
 
   /* Footer ambience */
@@ -113,12 +136,14 @@
 
 /* Display type: Apple-tight tracking, Inter's optical size axis kicks in at large sizes. */
 @utility text-display-1 {
+  font-family: var(--font-display);
   font-size: clamp(66px, 9vw, 128px);
   line-height: 0.91;
   letter-spacing: -0.06em;
   font-weight: 600;
 }
 @utility text-display-2 {
+  font-family: var(--font-display);
   font-size: clamp(48px, 7vw, 92px);
   line-height: 0.96;
   letter-spacing: -0.05em;

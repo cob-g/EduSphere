@@ -145,15 +145,14 @@ export function HeroWindow() {
         className="absolute inset-x-[8%] -bottom-10 h-24 rounded-[50%] bg-[radial-gradient(50%_50%_at_50%_50%,rgba(0,0,0,.30),transparent_70%)] blur-2xl"
       />
 
-      {/* Entrance: MotionConfig reducedMotion="user" already drops the travel
-          for reduced-motion users, so no conditional initial (a conditional
-          would differ between server and first client render). */}
-      <motion.div
+      {/* Entrance in CSS, like the headline above it: same travel, curve and
+          delay as before, but it starts with the first paint. Driven by Motion
+          it sat at opacity 0 in the server HTML until the JavaScript had
+          downloaded and hydrated, so on a slow connection the biggest thing in
+          the hero was missing for the first seconds (and for good without JS). */}
+      <div
         aria-hidden
-        initial={{ opacity: 0, y: 56 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.5 }}
-        className="relative h-[620px] overflow-hidden rounded-[30px] text-ink shadow-[0_50px_120px_rgba(0,0,0,.14),0_14px_34px_rgba(0,0,0,.06),inset_0_1px_0_#fff,inset_0_0_0_1px_rgba(255,255,255,.7)] max-sm:h-[600px] max-sm:rounded-[22px] sm:[-webkit-box-reflect:below_2px_linear-gradient(transparent_74%,rgba(0,0,0,.13))]"
+        className="motion-safe:animate-rise-window relative h-[620px] overflow-hidden rounded-[30px] text-ink shadow-[0_50px_120px_rgba(0,0,0,.14),0_14px_34px_rgba(0,0,0,.06),inset_0_1px_0_#fff,inset_0_0_0_1px_rgba(255,255,255,.7)] max-sm:h-[600px] max-sm:rounded-[22px] sm:[-webkit-box-reflect:below_2px_linear-gradient(transparent_74%,rgba(0,0,0,.13))]"
       >
         {/* App chrome */}
         <div
@@ -333,7 +332,7 @@ export function HeroWindow() {
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

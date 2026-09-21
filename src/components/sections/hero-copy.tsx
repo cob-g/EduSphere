@@ -35,8 +35,12 @@ export function HeroCopy() {
         your whole school.
       </p>
 
+      {/* On phones the column gap is 4px tighter. At 402px (iPhone Pro) the two
+          actions fit on one row in Inter with a pixel to spare, but not in the
+          fallback font, so the row unwrapped when Inter arrived and everything
+          below jumped up 36px. */}
       <div
-        className={`mt-[34px] flex flex-wrap items-center justify-center gap-3 [animation-delay:.3s] ${rise}`}
+        className={`mt-[34px] flex flex-wrap items-center justify-center gap-3 max-sm:gap-x-2 [animation-delay:.3s] ${rise}`}
       >
         <Button href="#teacher" variant="primary">
           See EduSphere AI

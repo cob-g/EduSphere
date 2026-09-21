@@ -13,7 +13,13 @@ type ButtonProps = {
   arrow?: boolean;
   className?: string;
   children: React.ReactNode;
-} & Omit<ComponentPropsWithoutRef<typeof Link>, "href" | "className" | "children">;
+} & Omit<ComponentPropsWithoutRef<"a">, "href" | "className" | "children">;
+
+// Only a path to another page on this site is a route. Everything the site
+// links to today is an in-page anchor or a mailto, and next/link buys nothing
+// there: it prefetched the page the visitor was already on (two wasted
+// requests per load) and the browser's own anchor handling does the rest.
+const isRoute = (href: string) => href.startsWith("/") && !href.startsWith("//");
 
 // Monochrome pill buttons. Colours are driven by the nearest `[data-theme]`
 // ancestor so the same component works on light and dark sections:
@@ -51,8 +57,9 @@ export function Button({
   children,
   ...props
 }: ButtonProps) {
+  const Tag = isRoute(href) ? Link : "a";
   return (
-    <Link
+    <Tag
       href={href}
       className={`${base} ${variant === "link" ? "" : sizes[size]} ${variants[variant]} ${className}`}
       {...props}
@@ -64,6 +71,6 @@ export function Button({
           className="size-4 transition-transform duration-200 ease-apple group-hover:translate-x-0.5"
         />
       )}
-    </Link>
+    </Tag>
   );
 }

@@ -2,7 +2,6 @@
 
 import { Blocks, LayoutGrid, ShieldCheck, Sparkles, Tag, type LucideIcon } from "lucide-react";
 import { motion } from "motion/react";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { navLinks } from "@/lib/constants/nav";
@@ -42,9 +41,11 @@ export function MobileDock() {
     const desktop = window.matchMedia("(min-width: 62.5rem)");
 
     let frame = 0;
+    // The bands are fixed for the life of the page: look them up once rather
+    // than twice on every scrolled frame.
+    const sections = document.querySelectorAll<HTMLElement>("section[data-theme]");
 
     const sectionAt = (y: number) => {
-      const sections = document.querySelectorAll<HTMLElement>("section[data-theme]");
       for (const section of sections) {
         const rect = section.getBoundingClientRect();
         if (rect.top <= y && rect.bottom > y) return section;
@@ -113,7 +114,7 @@ export function MobileDock() {
                   className={`absolute inset-0 rounded-[20px] ${highlight}`}
                 />
               )}
-              <Link
+              <a
                 href={link.href}
                 aria-current={isActive ? "location" : undefined}
                 aria-label={link.label}
@@ -121,7 +122,7 @@ export function MobileDock() {
               >
                 <Icon aria-hidden className="size-[19px]" strokeWidth={isActive ? 2.25 : 1.75} />
                 {link.short}
-              </Link>
+              </a>
             </motion.div>
           );
         })}

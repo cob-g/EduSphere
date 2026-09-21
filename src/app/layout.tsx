@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import type { CSSProperties } from "react";
 import { Instrument_Serif, Inter } from "next/font/google";
 
 import { MotionProvider } from "@/components/motion/motion-provider";
@@ -14,6 +15,18 @@ const inter = Inter({
   variable: "--font-inter",
   axes: ["opsz"],
 });
+
+// Display headlines use Inter with their own fallback, not next/font's
+// automatic one. That fallback (Arial at 107%) is tuned for Inter at text
+// sizes, but the display cut the optical-size axis selects for big headlines
+// runs about 6% narrower. On iPhone-width screens the difference wrapped the
+// hero headline onto an extra line until Inter arrived, and the page then
+// jumped up 60px. globals.css pairs this family name with a hand-tuned
+// "Inter Display Fallback" instead. The name is read from next/font rather
+// than written out, so it stays correct if the generated name ever changes.
+// (A second Inter() instance would do the same job but emits a second copy of
+// the font file under a different URL, and the browser downloads both.)
+const interFamilyName = inter.style.fontFamily.split(",")[0].trim();
 
 // One italic serif, used for the second line of two-tone headlines. It is the
 // one thing on the page Apple's system never does, and it carries the warmth
@@ -55,7 +68,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${inter.variable} ${serif.variable}`}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${serif.variable}`}
+      style={{ "--font-inter-name": interFamilyName } as CSSProperties}
+    >
       <body>
         <MotionProvider>{children}</MotionProvider>
         <script

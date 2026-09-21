@@ -1,21 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
+import { markBlack, markWhite } from "@/lib/assets/images";
 import { navActions, navLinks } from "@/lib/constants/nav";
 
 // Sample line, a little below the centre of the 64px bar. Whichever
 // `section[data-theme]` spans it decides the nav's light/dark mode.
 const PROBE_Y = 42;
 const SCROLLED_AT = 8;
-
-// Globe mark only (public/brand/edusphere-mark-*.png). Intrinsic ratio is
-// passed to next/image; the rendered size is set in CSS.
-const MARK = { width: 952, height: 777 } as const;
 
 // Backdrop that appears once the page scrolls: page ground fading to
 // transparent, with the blur masked out over the same run so there is no edge.
@@ -41,12 +37,14 @@ export function SiteNav() {
   // Theme + backdrop follow the section under the bar (rAF-throttled).
   useEffect(() => {
     let frame = 0;
+    // The bands are fixed for the life of the page: look them up once rather
+    // than on every scrolled frame.
+    const sections = document.querySelectorAll<HTMLElement>("section[data-theme]");
 
     const measure = () => {
       frame = 0;
       setScrolled(window.scrollY > SCROLLED_AT);
 
-      const sections = document.querySelectorAll<HTMLElement>("section[data-theme]");
       let theme: string | undefined;
       for (const section of sections) {
         const rect = section.getBoundingClientRect();
@@ -87,7 +85,9 @@ export function SiteNav() {
       />
 
       <Container as="nav" aria-label="Primary" className="relative z-10 flex h-16 items-center justify-between">
-        <Link
+        {/* Plain anchors throughout: these are all in-page links, and next/link
+            would prefetch the page the visitor is already on. */}
+        <a
           href="#top"
           aria-label="EduSphere AI — home"
           className="inline-flex items-center gap-2.5 whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current"
@@ -97,18 +97,14 @@ export function SiteNav() {
               both, and the hidden one would be a wasted request. */}
           <span className="relative block h-[26px] shrink-0">
             <Image
-              src="/brand/edusphere-mark-black.png"
+              src={markBlack}
               alt=""
-              width={MARK.width}
-              height={MARK.height}
               sizes="32px"
               className={`h-[26px] w-auto transition-opacity duration-300 ease-apple ${dark ? "opacity-0" : "opacity-100"}`}
             />
             <Image
-              src="/brand/edusphere-mark-white.png"
+              src={markWhite}
               alt=""
-              width={MARK.width}
-              height={MARK.height}
               sizes="32px"
               className={`absolute inset-0 h-[26px] w-auto transition-opacity duration-300 ease-apple ${dark ? "opacity-100" : "opacity-0"}`}
             />
@@ -117,23 +113,23 @@ export function SiteNav() {
           <span className="rounded-[5px] border border-current/40 px-1 text-[10px] font-medium leading-[1.5]">
             AI
           </span>
-        </Link>
+        </a>
 
         {/* Absolutely centred so it stays centred regardless of the side widths. */}
         <ul className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-5 lg:flex xl:gap-7">
           {navLinks.map((link) => (
             <li key={link.href}>
-              <Link href={link.href} className={textLink}>
+              <a href={link.href} className={textLink}>
                 {link.label}
-              </Link>
+              </a>
             </li>
           ))}
         </ul>
 
         <div className="flex items-center gap-4 lg:gap-5">
-          <Link href={navActions.signIn.href} className={textLink}>
+          <a href={navActions.signIn.href} className={textLink}>
             {navActions.signIn.label}
-          </Link>
+          </a>
           <Button href={navActions.demo.href} variant="ghost" size="sm">
             <span className="lg:hidden">Demo</span>
             <span className="max-lg:hidden">{navActions.demo.label}</span>
