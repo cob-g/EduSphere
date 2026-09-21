@@ -47,6 +47,10 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   applicationName: siteConfig.name,
+  // The same page answers on the apex domain, on www and on the Railway
+  // address. This names the one search engines should index, resolved against
+  // metadataBase (NEXT_PUBLIC_SITE_URL).
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     siteName: siteConfig.name,
