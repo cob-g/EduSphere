@@ -48,15 +48,26 @@ export function HeroScene() {
 
         // Idle drift for the clouds (time-driven, on x — never fights the
         // scroll-driven y above because GSAP composes transforms per axis).
-        gsap.utils.toArray<HTMLElement>('[data-hero^="cloud"]', root).forEach((bank) => {
+        const drifts = gsap.utils.toArray<HTMLElement>('[data-hero^="cloud"]', root).map((bank) =>
           gsap.to(bank, {
             x: Number(bank.dataset.drift ?? 30),
             duration: Number(bank.dataset.period ?? 24),
             ease: "sine.inOut",
             yoyo: true,
             repeat: -1,
-          });
+          }),
+        );
+
+        // The drift never ends, so it only runs while the hero is on screen.
+        // Left alone it restyled both cloud banks on every frame of the whole
+        // visit, which also kept GSAP's ticker (and the browser) from idling.
+        const io = new IntersectionObserver(([entry]) => {
+          for (const tween of drifts) {
+            if (entry.isIntersecting) tween.resume();
+            else tween.pause();
+          }
         });
+        io.observe(root);
 
         gsap.to('[data-hero="copy"]', {
           y: -70,
@@ -78,6 +89,8 @@ export function HeroScene() {
             scrollTrigger: { trigger: root, start: "top top", end: "45% top", scrub: 1 },
           },
         );
+
+        return () => io.disconnect();
       });
     },
     { scope },

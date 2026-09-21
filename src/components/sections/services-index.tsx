@@ -17,11 +17,15 @@ export function ServicesIndex({ entries }: { entries: Entry[] }) {
       .filter((el): el is HTMLElement => el !== null);
     if (groups.length === 0) return;
 
+    // The list is display:none below the lg breakpoint; skip the work there.
+    const desktop = window.matchMedia("(min-width: 62.5rem)");
+
     // A group is "current" once its top passes a line 35% down the viewport;
     // the last such group wins. Cheaper and steadier than intersection ratios.
     let frame = 0;
     const update = () => {
       frame = 0;
+      if (!desktop.matches) return;
       const line = window.innerHeight * 0.35;
       let current = groups[0].id;
       for (const g of groups) {

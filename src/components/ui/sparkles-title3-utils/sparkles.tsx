@@ -153,6 +153,10 @@ export function Sparkles({
     };
 
     const onMove = (event: PointerEvent) => {
+      // This listens on the window, so it fires for every pointer move on the
+      // page. Off screen there is nothing to attract, and measuring the canvas
+      // would force a layout in the middle of whatever else is animating.
+      if (!visible) return;
       const rect = canvas.getBoundingClientRect();
       pointer.x = event.clientX - rect.left;
       pointer.y = event.clientY - rect.top;

@@ -78,6 +78,11 @@ export default function StackInteractor({ items, className = "", grayscale = tru
   const [active, setActive] = useState(0);
   const scope = useRef<HTMLDivElement>(null);
   const loop = useRef<gsap.core.Timeline | null>(null);
+  // Whether the panel is on (or about to be on) screen. The loop never ends, so
+  // without this it kept writing SVG transforms sixty times a second for the
+  // whole visit, forcing a style recalculation and layout on every frame even
+  // with the section thousands of pixels away.
+  const onScreen = useRef(false);
   const uid = useId().replace(/:/g, "");
   const clipId = (layout: StackLayout) => `${uid}-${layout}`;
 
@@ -92,6 +97,7 @@ export default function StackInteractor({ items, className = "", grayscale = tru
       .to(pieces, { scale: 1, duration: 0.8, stagger: { amount: 0.4, from: "random" }, ease: "expo.out" })
       .to(pieces, { scale: 1.05, duration: 1.5, yoyo: true, repeat: 1, ease: "sine.inOut", stagger: { amount: 0.2, from: "center" } })
       .to(pieces, { scale: 0, duration: 0.6, stagger: { amount: 0.3, from: "edges" }, ease: "expo.in" });
+    if (!onScreen.current) loop.current.pause();
   };
 
   useGSAP(
@@ -99,7 +105,22 @@ export default function StackInteractor({ items, className = "", grayscale = tru
       const mm = gsap.matchMedia();
       mm.add(MOTION_QUERIES.motionOK, () => {
         play(active);
-        return () => loop.current?.kill();
+        // Paused off screen, resumed a little before it scrolls into view. A
+        // loop that has never run starts from its assemble step, so arriving
+        // readers see the pieces come together rather than a random phase.
+        const io = new IntersectionObserver(
+          ([entry]) => {
+            onScreen.current = entry.isIntersecting;
+            if (entry.isIntersecting) loop.current?.resume();
+            else loop.current?.pause();
+          },
+          { rootMargin: "200px 0px" },
+        );
+        if (scope.current) io.observe(scope.current);
+        return () => {
+          io.disconnect();
+          loop.current?.kill();
+        };
       });
       mm.add(MOTION_QUERIES.reduceMotion, () => {
         gsap.set(`#${clipId(items[active].layout)} .piece`, { scale: 1, transformOrigin: "50% 50%" });
