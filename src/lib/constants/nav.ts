@@ -21,9 +21,9 @@ export const contactEmail = "edusphereai.ph@gmail.com";
 
 // Social profiles shown in the footer. Only accounts that actually exist
 // belong here: a link to a profile that 404s reads worse than no link at all,
-// especially one section after the page promises auditability. LinkedIn and
-// Telegram icons are still wired up in the footer's SOCIAL_ICONS map, so
-// adding a row back here is all it takes once those accounts are live.
+// especially one section after the page promises auditability. The footer
+// renders each row as a text link, so adding a row back here is all it takes
+// once another account is live.
 export const socialLinks = [
   {
     label: "Facebook",
